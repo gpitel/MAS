@@ -5354,6 +5354,19 @@ namespace MAS {
     enum class WindingWindowShape : int { RECTANGULAR, ROUND };
 
     /**
+     * Default order in which consecutive layers are wound within each section in this winding
+     * window (overridable per section). 'U' alternates the winding direction every layer
+     * (back-and-forth); 'Z' winds every layer in the same direction with a return wire
+     * (foldback).
+     *
+     * Order in which consecutive layers are wound within this section. 'U' alternates the
+     * winding direction every layer (back-and-forth); 'Z' winds every layer in the same
+     * direction with a return wire (foldback). If unset, the winding window's windingOrder
+     * applies, else 'Z'.
+     */
+    enum class WindingOrder : int { U, Z };
+
+    /**
      * List of rectangular winding windows
      *
      * It is the area between the winding column and the closest lateral column, and it
@@ -5381,6 +5394,7 @@ namespace MAS {
         std::optional<WindingOrientation> sections_orientation;
         std::optional<WindingWindowShape> shape;
         std::optional<double> width;
+        std::optional<WindingOrder> winding_order;
         std::optional<double> angle;
         std::optional<double> radial_height;
 
@@ -5432,6 +5446,15 @@ namespace MAS {
          */
         std::optional<double> get_width() const { return width; }
         void set_width(std::optional<double> value) { this->width = value; }
+
+        /**
+         * Default order in which consecutive layers are wound within each section in this winding
+         * window (overridable per section). 'U' alternates the winding direction every layer
+         * (back-and-forth); 'Z' winds every layer in the same direction with a return wire
+         * (foldback).
+         */
+        std::optional<WindingOrder> get_winding_order() const { return winding_order; }
+        void set_winding_order(std::optional<WindingOrder> value) { this->winding_order = value; }
 
         /**
          * Total angle of the window
@@ -6412,6 +6435,7 @@ namespace MAS {
         ClassMemberConstraints number_layers_constraint;
         std::vector<PartialWinding> partial_windings;
         ElectricalType type;
+        std::optional<WindingOrder> winding_order;
         std::optional<WindingStyle> winding_style;
 
         public:
@@ -6493,6 +6517,15 @@ namespace MAS {
         const ElectricalType & get_type() const { return type; }
         ElectricalType & get_mutable_type() { return type; }
         void set_type(const ElectricalType & value) { this->type = value; }
+
+        /**
+         * Order in which consecutive layers are wound within this section. 'U' alternates the
+         * winding direction every layer (back-and-forth); 'Z' winds every layer in the same
+         * direction with a return wire (foldback). If unset, the winding window's windingOrder
+         * applies, else 'Z'.
+         */
+        std::optional<WindingOrder> get_winding_order() const { return winding_order; }
+        void set_winding_order(std::optional<WindingOrder> value) { this->winding_order = value; }
 
         /**
          * Defines if the section is wound by consecutive turns or parallels
@@ -10988,6 +11021,9 @@ void to_json(json & j, const WindingOrientation & x);
 void from_json(const json & j, WindingWindowShape & x);
 void to_json(json & j, const WindingWindowShape & x);
 
+void from_json(const json & j, WindingOrder & x);
+void to_json(json & j, const WindingOrder & x);
+
 void from_json(const json & j, Direction & x);
 void to_json(json & j, const Direction & x);
 
@@ -12592,6 +12628,7 @@ namespace MAS {
         x.set_sections_orientation(get_stack_optional<WindingOrientation>(j, "sectionsOrientation"));
         x.set_shape(get_stack_optional<WindingWindowShape>(j, "shape"));
         x.set_width(get_stack_optional<double>(j, "width"));
+        x.set_winding_order(get_stack_optional<WindingOrder>(j, "windingOrder"));
         x.set_angle(get_stack_optional<double>(j, "angle"));
         x.set_radial_height(get_stack_optional<double>(j, "radialHeight"));
     }
@@ -12605,6 +12642,7 @@ namespace MAS {
         j["sectionsOrientation"] = x.get_sections_orientation();
         j["shape"] = x.get_shape();
         j["width"] = x.get_width();
+        j["windingOrder"] = x.get_winding_order();
         j["angle"] = x.get_angle();
         j["radialHeight"] = x.get_radial_height();
     }
@@ -12918,6 +12956,7 @@ namespace MAS {
         x.set_number_layers(get_stack_optional<double>(j, "numberLayers"));
         x.set_partial_windings(j.at("partialWindings").get<std::vector<PartialWinding>>());
         x.set_type(j.at("type").get<ElectricalType>());
+        x.set_winding_order(get_stack_optional<WindingOrder>(j, "windingOrder"));
         x.set_winding_style(get_stack_optional<WindingStyle>(j, "windingStyle"));
     }
 
@@ -12935,6 +12974,7 @@ namespace MAS {
         j["numberLayers"] = x.get_number_layers();
         j["partialWindings"] = x.get_partial_windings();
         j["type"] = x.get_type();
+        j["windingOrder"] = x.get_winding_order();
         j["windingStyle"] = x.get_winding_style();
     }
 
@@ -15107,6 +15147,20 @@ namespace MAS {
             case WindingWindowShape::RECTANGULAR: j = "rectangular"; break;
             case WindingWindowShape::ROUND: j = "round"; break;
             default: throw std::runtime_error("Unexpected value in enumeration \"WindingWindowShape\": " + std::to_string(static_cast<int>(x)));
+        }
+    }
+
+    inline void from_json(const json & j, WindingOrder & x) {
+        if (j == "U") x = WindingOrder::U;
+        else if (j == "Z") x = WindingOrder::Z;
+        else { throw std::runtime_error("Input JSON does not conform to schema!"); }
+    }
+
+    inline void to_json(json & j, const WindingOrder & x) {
+        switch (x) {
+            case WindingOrder::U: j = "U"; break;
+            case WindingOrder::Z: j = "Z"; break;
+            default: throw std::runtime_error("Unexpected value in enumeration \"WindingOrder\": " + std::to_string(static_cast<int>(x)));
         }
     }
 

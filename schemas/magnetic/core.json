@@ -267,6 +267,15 @@
                         "spread",
                         "centered"
                     ]
+                },
+                "windingOrder": {
+                    "description": "Default order in which consecutive layers are wound within each section in this winding window (overridable per section). 'U' alternates the winding direction every layer (back-and-forth); 'Z' winds every layer in the same direction with a return wire (foldback).",
+                    "title": "windingOrder",
+                    "type": "string",
+                    "enum": [
+                        "U",
+                        "Z"
+                    ]
                 }
             },
             "required": [
@@ -310,6 +319,15 @@
                     "enum": [
                         "contiguous",
                         "overlapping"
+                    ]
+                },
+                "windingOrder": {
+                    "description": "Default order in which consecutive layers are wound within each section in this winding window (overridable per section). 'U' alternates the winding direction every layer (back-and-forth); 'Z' winds every layer in the same direction with a return wire (foldback).",
+                    "title": "windingOrder",
+                    "type": "string",
+                    "enum": [
+                        "U",
+                        "Z"
                     ]
                 }
             },

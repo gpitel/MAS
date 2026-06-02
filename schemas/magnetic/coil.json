@@ -449,6 +449,15 @@
                         "windByConsecutiveParallels"
                     ]
                 },
+                "windingOrder": {
+                    "description": "Order in which consecutive layers are wound within this section. 'U' alternates the winding direction every layer (back-and-forth); 'Z' winds every layer in the same direction with a return wire (foldback). If unset, the winding window's windingOrder applies, else 'Z'.",
+                    "title": "windingOrder",
+                    "type": "string",
+                    "enum": [
+                        "U",
+                        "Z"
+                    ]
+                },
                 "margin": {
                     "description": "Defines the distance at the extremes of the section reserved for margin tape. Two-element array, from 'inner or top' to 'outer or bottom'.",
                     "oneOf": [
