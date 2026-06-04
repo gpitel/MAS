@@ -33,6 +33,7 @@ trap 'rm -rf "$tmpdir"' EXIT
 quicktype -l c++ -s schema ./schemas/MAS.json \
     -S ./schemas/magnetic.json -S ./schemas/magnetic/core.json -S ./schemas/magnetic/coil.json -S ./schemas/utils.json \
     -S ./schemas/magnetic/core/gap.json -S ./schemas/magnetic/core/shape.json -S ./schemas/magnetic/core/material.json \
+    -S ./schemas/magnetic/core/coating.json \
     -S ./schemas/magnetic/insulation/material.json -S ./schemas/magnetic/insulation/wireCoating.json -S ./schemas/magnetic/bobbin.json \
     -S ./schemas/magnetic/core/piece.json -S ./schemas/magnetic/core/spacer.json \
     -S ./schemas/magnetic/wire/basicWire.json -S ./schemas/magnetic/wire/round.json -S ./schemas/magnetic/wire/rectangular.json \

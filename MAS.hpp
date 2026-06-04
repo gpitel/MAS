@@ -6720,9 +6720,45 @@ namespace MAS {
     };
 
     /**
-     * The coating of the core
+     * The type of coating material applied to the core
      */
-    enum class Coating : int { EPOXY, PARYLENE };
+    enum class CoatingType : int { EPOXY, GLASS, NYLON, PARYLENE };
+
+    /**
+     * Data describing the insulating coating applied to a magnetic core
+     */
+    class CoreCoating {
+        public:
+        CoreCoating() = default;
+        virtual ~CoreCoating() = default;
+
+        private:
+        std::optional<InsulationMaterialDataOrNameUnion> material;
+        double thickness;
+        std::optional<CoatingType> type;
+
+        public:
+        /**
+         * Material of the coating, providing its relative permittivity and dielectric strength
+         */
+        std::optional<InsulationMaterialDataOrNameUnion> get_material() const { return material; }
+        void set_material(std::optional<InsulationMaterialDataOrNameUnion> value) { this->material = value; }
+
+        /**
+         * Thickness of the coating, in m
+         */
+        const double & get_thickness() const { return thickness; }
+        double & get_mutable_thickness() { return thickness; }
+        void set_thickness(const double & value) { this->thickness = value; }
+
+        /**
+         * The type of coating material applied to the core
+         */
+        std::optional<CoatingType> get_type() const { return type; }
+        void set_type(std::optional<CoatingType> value) { this->type = value; }
+    };
+
+    using CoreCoatingDataOrNameUnion = std::variant<CoreCoating, std::string>;
 
     /**
      * The type of a gap
@@ -7906,7 +7942,7 @@ namespace MAS {
         virtual ~CoreFunctionalDescription() = default;
 
         private:
-        std::optional<Coating> coating;
+        std::optional<CoreCoatingDataOrNameUnion> coating;
         std::vector<CoreGap> gapping;
         CoreMaterialDataOrNameUnion material;
         std::optional<int64_t> number_stacks;
@@ -7918,8 +7954,8 @@ namespace MAS {
         /**
          * The coating of the core
          */
-        std::optional<Coating> get_coating() const { return coating; }
-        void set_coating(std::optional<Coating> value) { this->coating = value; }
+        std::optional<CoreCoatingDataOrNameUnion> get_coating() const { return coating; }
+        void set_coating(std::optional<CoreCoatingDataOrNameUnion> value) { this->coating = value; }
 
         /**
          * The lists of gaps in the magnetic core
@@ -10688,6 +10724,9 @@ void to_json(json & j, const Turn & x);
 void from_json(const json & j, Coil & x);
 void to_json(json & j, const Coil & x);
 
+void from_json(const json & j, CoreCoating & x);
+void to_json(json & j, const CoreCoating & x);
+
 void from_json(const json & j, CoreGap & x);
 void to_json(json & j, const CoreGap & x);
 
@@ -11051,8 +11090,8 @@ void to_json(json & j, const TurnCrossSectionalShape & x);
 void from_json(const json & j, TurnOrientation & x);
 void to_json(json & j, const TurnOrientation & x);
 
-void from_json(const json & j, Coating & x);
-void to_json(json & j, const Coating & x);
+void from_json(const json & j, CoatingType & x);
+void to_json(json & j, const CoatingType & x);
 
 void from_json(const json & j, GapType & x);
 void to_json(json & j, const GapType & x);
@@ -11164,6 +11203,12 @@ template <>
 struct adl_serializer<std::variant<std::vector<double>, MAS::MarginInfo>> {
     static void from_json(const json & j, std::variant<std::vector<double>, MAS::MarginInfo> & x);
     static void to_json(json & j, const std::variant<std::vector<double>, MAS::MarginInfo> & x);
+};
+
+template <>
+struct adl_serializer<std::variant<MAS::CoreCoating, std::string>> {
+    static void from_json(const json & j, std::variant<MAS::CoreCoating, std::string> & x);
+    static void to_json(json & j, const std::variant<MAS::CoreCoating, std::string> & x);
 };
 
 template <>
@@ -13032,6 +13077,19 @@ namespace MAS {
         j["turnsDescription"] = x.get_turns_description();
     }
 
+    inline void from_json(const json & j, CoreCoating& x) {
+        x.set_material(get_stack_optional<std::variant<InsulationMaterial, std::string>>(j, "material"));
+        x.set_thickness(j.at("thickness").get<double>());
+        x.set_type(get_stack_optional<CoatingType>(j, "type"));
+    }
+
+    inline void to_json(json & j, const CoreCoating & x) {
+        j = json::object();
+        j["material"] = x.get_material();
+        j["thickness"] = x.get_thickness();
+        j["type"] = x.get_type();
+    }
+
     inline void from_json(const json & j, CoreGap& x) {
         x.set_area(get_stack_optional<double>(j, "area"));
         x.set_coordinates(get_stack_optional<std::vector<double>>(j, "coordinates"));
@@ -13411,7 +13469,7 @@ namespace MAS {
     }
 
     inline void from_json(const json & j, CoreFunctionalDescription& x) {
-        x.set_coating(get_stack_optional<Coating>(j, "coating"));
+        x.set_coating(get_stack_optional<std::variant<CoreCoating, std::string>>(j, "coating"));
         x.set_gapping(j.at("gapping").get<std::vector<CoreGap>>());
         x.set_material(j.at("material").get<CoreMaterialDataOrNameUnion>());
         x.set_number_stacks(get_stack_optional<int64_t>(j, "numberStacks"));
@@ -15312,17 +15370,21 @@ namespace MAS {
         }
     }
 
-    inline void from_json(const json & j, Coating & x) {
-        if (j == "epoxy") x = Coating::EPOXY;
-        else if (j == "parylene") x = Coating::PARYLENE;
+    inline void from_json(const json & j, CoatingType & x) {
+        if (j == "epoxy") x = CoatingType::EPOXY;
+        else if (j == "glass") x = CoatingType::GLASS;
+        else if (j == "nylon") x = CoatingType::NYLON;
+        else if (j == "parylene") x = CoatingType::PARYLENE;
         else { throw std::runtime_error("Input JSON does not conform to schema!"); }
     }
 
-    inline void to_json(json & j, const Coating & x) {
+    inline void to_json(json & j, const CoatingType & x) {
         switch (x) {
-            case Coating::EPOXY: j = "epoxy"; break;
-            case Coating::PARYLENE: j = "parylene"; break;
-            default: throw std::runtime_error("Unexpected value in enumeration \"Coating\": " + std::to_string(static_cast<int>(x)));
+            case CoatingType::EPOXY: j = "epoxy"; break;
+            case CoatingType::GLASS: j = "glass"; break;
+            case CoatingType::NYLON: j = "nylon"; break;
+            case CoatingType::PARYLENE: j = "parylene"; break;
+            default: throw std::runtime_error("Unexpected value in enumeration \"CoatingType\": " + std::to_string(static_cast<int>(x)));
         }
     }
 
@@ -15872,6 +15934,26 @@ namespace nlohmann {
                 break;
             case 1:
                 j = std::get<MAS::MarginInfo>(x);
+                break;
+            default: throw std::runtime_error("Input JSON does not conform to schema!");
+        }
+    }
+
+    inline void adl_serializer<std::variant<MAS::CoreCoating, std::string>>::from_json(const json & j, std::variant<MAS::CoreCoating, std::string> & x) {
+        if (j.is_string())
+            x = j.get<std::string>();
+        else if (j.is_object())
+            x = j.get<MAS::CoreCoating>();
+        else throw std::runtime_error("Could not deserialise!");
+    }
+
+    inline void adl_serializer<std::variant<MAS::CoreCoating, std::string>>::to_json(json & j, const std::variant<MAS::CoreCoating, std::string> & x) {
+        switch (x.index()) {
+            case 0:
+                j = std::get<MAS::CoreCoating>(x);
+                break;
+            case 1:
+                j = std::get<std::string>(x);
                 break;
             default: throw std::runtime_error("Input JSON does not conform to schema!");
         }

@@ -76,10 +76,15 @@
                 },
                 "coating": {
                     "description": "The coating of the core",
-                    "type": "string",
-                    "enum": [
-                        "epoxy",
-                        "parylene"
+                    "title": "CoreCoatingDataOrNameUnion",
+                    "oneOf": [
+                        {
+                            "$ref": "./core/coating.json"
+                        },
+                        {
+                            "description": "The name of the coating used in the core",
+                            "type": "string"
+                        }
                     ]
                 }
             },
