@@ -343,6 +343,10 @@
                 "mounting": {
                     "description": "PCB mounting style. Uses the same connectionType enum as designRequirements.terminalType.",
                     "$ref": "./utils.json#/$defs/connectionType"
+                },
+                "weight": {
+                    "description": "Body weight in kilograms.",
+                    "$ref": "./utils.json#/$defs/dimensionWithTolerance"
                 }
             },
             "additionalProperties": false
