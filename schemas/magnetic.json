@@ -532,6 +532,10 @@
                 "pinLength": {
                     "description": "Pin length in metres.",
                     "$ref": "./utils.json#/$defs/dimensionWithTolerance"
+                },
+                "weight": {
+                    "description": "Body weight in kilograms.",
+                    "$ref": "./utils.json#/$defs/dimensionWithTolerance"
                 }
             },
             "additionalProperties": false
