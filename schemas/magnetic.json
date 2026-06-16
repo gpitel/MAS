@@ -8,17 +8,11 @@
     "properties": {
         "core": {
             "description": "Data describing the magnetic core.",
-            "oneOf": [
-                {"$ref": "./magnetic/core.json"},
-                {"type": "null"}
-            ]
+            "$ref": "./magnetic/core.json"
         },
         "coil": {
             "description": "Data describing the coil",
-            "oneOf": [
-                {"$ref": "./magnetic/coil.json"},
-                {"type": "null"}
-            ]
+            "$ref": "./magnetic/coil.json"
         },
         "manufacturerInfo": {
             "title": "magneticManufacturerInfo",
@@ -52,8 +46,6 @@
         }
     },
     "required": [
-        "core",
-        "coil"
     ],
     "$defs": {
         "magneticDatasheetInfo": {
@@ -89,10 +81,7 @@
                 },
                 "model": {
                     "description": "Circuit model parameters for SPICE simulation.",
-                    "oneOf": [
-                        {"$ref": "#/$defs/magneticDatasheetModelParamsChipBead"},
-                        {"type": "null"}
-                    ]
+                    "$ref": "#/$defs/magneticDatasheetModelParamsChipBead"
                 }
             },
             "additionalProperties": false
