@@ -8,11 +8,17 @@
     "properties": {
         "core": {
             "description": "Data describing the magnetic core.",
-            "$ref": "./magnetic/core.json"
+            "oneOf": [
+                {"$ref": "./magnetic/core.json"},
+                {"type": "null"}
+            ]
         },
         "coil": {
             "description": "Data describing the coil",
-            "$ref": "./magnetic/coil.json"
+            "oneOf": [
+                {"$ref": "./magnetic/coil.json"},
+                {"type": "null"}
+            ]
         },
         "manufacturerInfo": {
             "title": "magneticManufacturerInfo",
@@ -60,7 +66,10 @@
                 },
                 "electrical": {
                     "description": "Electrical characteristics as stated in the datasheet.",
-                    "$ref": "#/$defs/magneticDatasheetElectrical"
+                    "oneOf": [
+                        {"$ref": "#/$defs/magneticDatasheetElectrical"},
+                        {"$ref": "#/$defs/magneticDatasheetElectricalChipBead"}
+                    ]
                 },
                 "thermal": {
                     "description": "Operating temperature range from the datasheet.",
@@ -77,6 +86,13 @@
                 "business": {
                     "description": "Packaging and supply-chain information from the datasheet or product page.",
                     "$ref": "#/$defs/magneticDatasheetBusiness"
+                },
+                "model": {
+                    "description": "Circuit model parameters for SPICE simulation.",
+                    "oneOf": [
+                        {"$ref": "#/$defs/magneticDatasheetModelParamsChipBead"},
+                        {"type": "null"}
+                    ]
                 }
             },
             "additionalProperties": false
@@ -301,6 +317,171 @@
             },
             "additionalProperties": false
         },
+        "magneticDatasheetElectricalChipBead": {
+            "description": "Electrical characteristics associated with a chip bead as stated in the datasheet.",
+            "type": "object",
+            "properties": {
+                "dcResistance": {
+                    "description": "DC resistance per winding in Ohms. nominal = typical value, maximum = datasheet max.",
+                    "$ref": "./utils.json#/$defs/dimensionWithTolerance"
+                },
+                "ratedCurrent": {
+                    "description": "Rated DC current per winding in Amperes.",
+                    "type": "number"
+                },
+                "impedancePoints": {
+                    "description": "Impedance vs. frequency points from the datasheet, optionally parameterised by DC bias current.",
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "title": "DatasheetImpedancePoint",
+                        "properties": {
+                            "impedance": {
+                                "description": "Impedance value.",
+                                "type": "number",
+                                "minimum": 0
+                            },
+                            "frequency": {
+                                "description": "Frequency in Hz.",
+                                "type": "number",
+                                "minimum": 0
+                            },
+                            "current": {
+                                "description": "DC bias current in Amperes at which this point was measured.",
+                                "type": "number",
+                                "minimum": 0
+                            }
+                        },
+                        "required": [
+                            "impedance",
+                            "frequency"
+                        ],
+                        "additionalProperties": false
+                    }
+                },
+                "resistancePoints": {
+                    "description": "Resistance vs. frequency points from the datasheet, optionally parameterised by DC bias current.",
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "title": "DatasheetResistancePoint",
+                        "properties": {
+                            "resistance": {
+                                "description": "Resistance value.",
+                                "type": "number",
+                                "minimum": 0
+                            },
+                            "frequency": {
+                                "description": "Frequency in Hz.",
+                                "type": "number",
+                                "minimum": 0
+                            },
+                            "current": {
+                                "description": "DC bias current in Amperes at which this point was measured.",
+                                "type": "number",
+                                "minimum": 0
+                            }
+                        },
+                        "required": [
+                            "resistance",
+                            "frequency"
+                        ],
+                        "additionalProperties": false
+                    }
+                },
+                "reactancePoints": {
+                    "description": "Reactance vs. frequency points from the datasheet, optionally parameterised by DC bias current.",
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "title": "DatasheetReactancePoint",
+                        "properties": {
+                            "reactance": {
+                                "description": "Reactance value.",
+                                "type": "number",
+                                "minimum": 0
+                            },
+                            "frequency": {
+                                "description": "Frequency in Hz.",
+                                "type": "number",
+                                "minimum": 0
+                            },
+                            "current": {
+                                "description": "DC bias current in Amperes at which this point was measured.",
+                                "type": "number",
+                                "minimum": 0
+                            }
+                        },
+                        "required": [
+                            "reactance",
+                            "frequency"
+                        ],
+                        "additionalProperties": false
+                    }
+                },
+                "pulsePoints": {
+                    "description": "Maximum pulse current vs. pulse length points from the datasheet.",
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "title": "DatasheetPulsePoint",
+                        "properties": {
+                            "pulseCurrent": {
+                                "description": "Pulse current value.",
+                                "type": "number",
+                                "minimum": 0
+                            },
+                            "pulseLength": {
+                                "description": "Pulse length in seconds.",
+                                "type": "number",
+                                "minimum": 0
+                            }
+                        },
+                        "required": [
+                            "pulseCurrent",
+                            "pulseLength"
+                        ],
+                        "additionalProperties": false
+                    }
+                },
+                "numberPulsesPoints": {
+                    "description": "Number of pulses vs. maximum pulse current points from the datasheet.",
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "title": "DatasheetNumberPulsesPoint",
+                        "properties": {
+                            "numberPulses": {
+                                "description": "Number of pulses.",
+                                "type": "number",
+                                "minimum": 0
+                            },
+                            "pulseCurrent": {
+                                "description": "Pulse current value.",
+                                "type": "number",
+                                "minimum": 0
+                            }
+                        },
+                        "required": [
+                            "numberPulses",
+                            "pulseCurrent"
+                        ],
+                        "additionalProperties": false
+                    }
+                },
+                "impedanceTolerance": {
+                    "description": "Tolerance on the impedance values in the datasheet, expressed as a percentage (e.g. 20 means ±20%).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                },
+                "selfResonantFrequency": {
+                    "description": "Self-resonant frequency in Hz.",
+                    "type": "number"
+                }
+            },
+            "additionalProperties": false
+        },
         "magneticDatasheetThermal": {
             "description": "Operating temperature range.",
             "type": "object",
@@ -343,6 +524,14 @@
                 "mounting": {
                     "description": "PCB mounting style. Uses the same connectionType enum as designRequirements.terminalType.",
                     "$ref": "./utils.json#/$defs/connectionType"
+                },
+                "assemblyType": {
+                    "description": "Assembly type (e.g. 'SMT', 'Through-hole').",
+                    "type": "string"
+                },
+                "pinLength": {
+                    "description": "Pin length in metres.",
+                    "$ref": "./utils.json#/$defs/dimensionWithTolerance"
                 }
             },
             "additionalProperties": false
@@ -357,6 +546,36 @@
                 }
             },
             "additionalProperties": false
+        },
+        "magneticDatasheetModelParamsChipBead": {
+            "description": "Circuit model parameters for SPICE simulation of Chip Beads",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "rp": {
+                    "description": "Parallel resistance in Ohms",
+                    "type": [
+                        "number"
+                    ]
+                },
+                "cp": {
+                    "description": "Parallel capacitance in Farads",
+                    "type": [
+                        "number"
+                    ]
+                },
+                "lp": {
+                    "description": "Parallel inductance in Henries",
+                    "type": [
+                        "number"
+                    ]
+                }
+            },
+            "required": [
+                "rp",
+                "cp",
+                "lp"
+            ]
         }
     }
 }

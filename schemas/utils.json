@@ -244,6 +244,10 @@
                 "cost": {
                     "description": "The distributor's price for this part.",
                     "$ref": "#/$defs/cost"
+                },
+                "internal": {
+                    "description": "True if the component is internal (not public).",
+                    "type": "boolean"
                 }
             },
             "required": [
