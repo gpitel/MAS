@@ -47,21 +47,13 @@
             "$ref": "#/$defs/insulation"
         },
         "insulationCoordination": {
-            "description": "Data describing the output insulation coordination that the magnetic has",
-            "$ref": "#/$defs/insulationCoordination"
+            "$ref": "https://psma.com/peas/outputs/insulationCoordination.json"
         }
     },
     "required": [],
     "$defs": {
         "resultOrigin": {
-            "description": "Origin of the value of the result",
-            "type": "string",
-            "title": "resultOrigin",
-            "enum": [
-                "manufacturer",
-                "measurement",
-                "simulation"
-            ]
+            "$ref": "https://psma.com/peas/utils.json#/$defs/resultOrigin"
         },
         "windingLosses": {
             "description": "Data describing the winding losses and the intermediate inputs used to calculate them",
@@ -150,7 +142,8 @@
                 "origin",
                 "methodUsed",
                 "windingLosses"
-            ]
+            ],
+            "additionalProperties": false
         },
         "temperature": {
             "description": "Data describing the temperature and the intermediate inputs used to calculate them",
@@ -187,7 +180,8 @@
                     "required": [
                         "value",
                         "coordinates"
-                    ]
+                    ],
+                    "additionalProperties": false
                 },
                 "bulkThermalResistance": {
                     "description": "Bulk thermal resistance of the whole magnetic. Unit: K/W.",
@@ -198,7 +192,8 @@
                 "origin",
                 "methodUsed",
                 "maximumTemperature"
-            ]
+            ],
+            "additionalProperties": false
         },
         "leakageInductance": {
             "description": "Data describing the leakage inductance and the intermediate inputs used to calculate them",
@@ -225,7 +220,8 @@
                 "origin",
                 "methodUsed",
                 "leakageInductancePerWinding"
-            ]
+            ],
+            "additionalProperties": false
         },
         "strayCapacitance": {
             "description": "Data describing the stray capacitance and the intermediate inputs used to calculate them",
@@ -368,7 +364,8 @@
                                     "C4",
                                     "C5",
                                     "C6"
-                                ]
+                                ],
+                                "additionalProperties": false
                             }
                         }
                     },
@@ -394,7 +391,8 @@
                                     "C1",
                                     "C2",
                                     "C3"
-                                ]
+                                ],
+                                "additionalProperties": false
                             }
                         }
                     }
@@ -447,7 +445,8 @@
             },
             "required": [
                 "magnetizingInductance"
-            ]
+            ],
+            "additionalProperties": false
         },
         "magnetizingInductance": {
             "description": "Data describing the magnetizing inductance and the intermediate inputs used to calculate them",
@@ -539,7 +538,8 @@
                 "methodUsed",
                 "magnetizingInductance",
                 "coreReluctance"
-            ]
+            ],
+            "additionalProperties": false
         },
         "impedance": {
             "description": "Data describing the impedance and the intermediate inputs used to calculate it",
@@ -583,7 +583,8 @@
                 "methodUsed",
                 "resistanceMatrix",
                 "inductanceMatrix"
-            ]
+            ],
+            "additionalProperties": false
         },
         "airGapReluctance": {
             "description": "Data describing the reluctance of an air gap",
@@ -619,7 +620,8 @@
                 "reluctance",
                 "fringingFactor",
                 "maximumStorableMagneticEnergy"
-            ]
+            ],
+            "additionalProperties": false
         },
         "windingWindowCurrentField": {
             "description": "Data describing the current in the different chunks used in field calculation",
@@ -645,7 +647,8 @@
                 "origin",
                 "methodUsed",
                 "fieldPerFrequency"
-            ]
+            ],
+            "additionalProperties": false
         },
         "windingWindowCurrentDensityField": {
             "description": "Data describing the current in the different chunks used in field calculation",
@@ -688,7 +691,8 @@
                 "methodUsed",
                 "wires",
                 "fieldPerFrequency"
-            ]
+            ],
+            "additionalProperties": false
         },
         "windingWindowMagneticStrengthField": {
             "type": "object",
@@ -713,43 +717,11 @@
                 "origin",
                 "methodUsed",
                 "fieldPerFrequency"
-            ]
+            ],
+            "additionalProperties": false
         },
         "windingLossElementPerHarmonic": {
-            "description": "Data describing the losses due to either DC, skin effect, or proximity effect; in a given element, which can be winding, section, layer or physical turn",
-            "title": "windingLossElement",
-            "type": "object",
-            "properties": {
-                "origin": {
-                    "$ref": "#/$defs/resultOrigin"
-                },
-                "methodUsed": {
-                    "description": "Model used to calculate the magnetizing inductance in the case of simulation, or method used to measure it",
-                    "type": "string"
-                },
-                "lossesPerHarmonic": {
-                    "description": "Losses produced by each harmonic",
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    },
-                    "uniqueItems": false
-                },
-                "harmonicFrequencies": {
-                    "description": "List of frequencies of the harmonics that are producing losses",
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    },
-                    "uniqueItems": true
-                }
-            },
-            "required": [
-                "origin",
-                "methodUsed",
-                "lossesPerHarmonic",
-                "harmonicFrequencies"
-            ]
+            "$ref": "https://psma.com/peas/outputs/lossElementPerHarmonic.json"
         },
         "windingLossesPerElement": {
             "type": "object",
@@ -784,7 +756,8 @@
                     "required": [
                         "origin",
                         "losses"
-                    ]
+                    ],
+                    "additionalProperties": false
                 },
                 "skinEffectLosses": {
                     "description": "List of value of the winding skin losses per harmonic",
@@ -794,7 +767,8 @@
                     "description": "List of value of the winding proximity losses per harmonic",
                     "$ref": "#/$defs/windingLossElementPerHarmonic"
                 }
-            }
+            },
+            "additionalProperties": false
         },
         "insulationCoordination": {
             "title": "insulationCoordinationOutput",
@@ -838,7 +812,8 @@
                 "clearance",
                 "distanceThroughInsulation",
                 "withstandVoltage"
-            ]
+            ],
+            "additionalProperties": false
         },
         "insulation": {
             "title": "insulationOutput",
@@ -882,7 +857,8 @@
                     "origin",
                     "voltage",
                     "voltageType"
-                ]
+                ],
+                "additionalProperties": false
             },
             "minItems": 1
         },
@@ -907,7 +883,8 @@
                 "firstTurnName",
                 "secondTurnName",
                 "value"
-            ]
+            ],
+            "additionalProperties": false
         },
         "electricEnergy": {
             "title": "electricEnergy",
@@ -930,14 +907,15 @@
                 "firstTurnName",
                 "secondTurnName",
                 "value"
-            ]
+            ],
+            "additionalProperties": false
         },
         "scalarMatrixAtFrequency": {
             "title": "scalarMatrixAtFrequency",
             "type": "object",
             "properties": {
                 "magnitude": {
-                    "$ref": "./utils.json#/$defs/twoDimensionalMatrix"
+                    "$ref": "./utils.json#/$defs/toleranceMatrix"
                 },
                 "frequency": {
                     "description": "Frequency of the matrix",
@@ -947,17 +925,18 @@
             "required": [
                 "magnitude",
                 "frequency"
-            ]
+            ],
+            "additionalProperties": false
         },
         "complexMatrixAtFrequency": {
             "title": "complexMatrixAtFrequency",
             "type": "object",
             "properties": {
                 "magnitude": {
-                    "$ref": "./utils.json#/$defs/twoDimensionalMatrix"
+                    "$ref": "./utils.json#/$defs/toleranceMatrix"
                 },
                 "phase": {
-                    "$ref": "./utils.json#/$defs/twoDimensionalMatrix"
+                    "$ref": "./utils.json#/$defs/toleranceMatrix"
                 },
                 "frequency": {
                     "description": "Frequency of the matrix",
@@ -968,7 +947,9 @@
                 "magnitude",
                 "phase",
                 "frequency"
-            ]
+            ],
+            "additionalProperties": false
         }
-    }
+    },
+    "additionalProperties": false
 }

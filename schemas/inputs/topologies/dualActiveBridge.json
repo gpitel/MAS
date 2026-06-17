@@ -80,9 +80,11 @@
                             "description": "D3 in degrees",
                             "type": "number"
                         }
-                    }
+                    },
+                    "additionalProperties": false
                 }
             ]
         }
-    }
+    },
+    "additionalProperties": false
 }

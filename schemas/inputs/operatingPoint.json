@@ -20,7 +20,7 @@
             "items": {
                 "title": "OperatingPointExcitationPerWinding",
                 "description": "Data describing the excitation of the winding",
-                "$ref": "./operatingPointExcitation.json"
+                "$ref": "https://psma.com/peas/inputs/operatingPointExcitation.json"
             },
             "minItems": 1
         }
@@ -29,5 +29,6 @@
         "conditions",
         "excitationsPerWinding"
     ],
-    "$defs": {}
+    "$defs": {},
+    "additionalProperties": false
 }

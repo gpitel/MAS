@@ -47,5 +47,6 @@
             "title": "buckOperatingPoint",
             "$ref": "../../utils.json#/$defs/baseOperatingPoint"
         }
-    }
+    },
+    "additionalProperties": false
 }

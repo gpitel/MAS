@@ -24,15 +24,24 @@ except ImportError:
     sys.exit(2)
 
 
-def load_registry(schema_dir: str) -> Registry:
+def load_registry(*schema_dirs: str) -> Registry:
+    # Register MAS's own schemas plus any sibling-family schemas (e.g. PEAS) that
+    # MAS now $refs after the inherit-from-PEAS integration. Resolved by $id.
     resources = []
-    for f in sorted(glob.glob(os.path.join(schema_dir, "**", "*.json"), recursive=True)):
-        with open(f) as fh:
-            s = json.load(fh)
-        if "$id" not in s:
-            print(f"WARN: {f} has no $id, skipping", file=sys.stderr)
+    seen = set()
+    for schema_dir in schema_dirs:
+        if not os.path.isdir(schema_dir):
             continue
-        resources.append((s["$id"], Resource.from_contents(s)))
+        for f in sorted(glob.glob(os.path.join(schema_dir, "**", "*.json"), recursive=True)):
+            with open(f) as fh:
+                s = json.load(fh)
+            if "$id" not in s:
+                print(f"WARN: {f} has no $id, skipping", file=sys.stderr)
+                continue
+            if s["$id"] in seen:
+                continue
+            seen.add(s["$id"])
+            resources.append((s["$id"], Resource.from_contents(s)))
     return Registry().with_resources(resources)
 
 
@@ -52,7 +61,7 @@ def main() -> int:
     args = ap.parse_args()
 
     os.chdir(args.root)
-    registry = load_registry("schemas")
+    registry = load_registry("schemas", "../PEAS/schemas")
     schema = json.load(open(args.schema))
     validator = Draft202012Validator(schema, registry=registry)
 

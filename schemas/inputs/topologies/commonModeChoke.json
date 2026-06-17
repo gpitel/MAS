@@ -76,7 +76,9 @@
             "required": [
                 "frequency",
                 "insertionLoss"
-            ]
+            ],
+            "additionalProperties": false
         }
-    }
+    },
+    "additionalProperties": false
 }

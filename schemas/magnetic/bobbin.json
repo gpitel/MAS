@@ -11,13 +11,13 @@
             "type": "string"
         },
         "manufacturerInfo": {
-            "$ref": "../utils.json#/$defs/manufacturerInfo"
+            "$ref": "https://psma.com/peas/utils.json#/$defs/manufacturerInfo"
         },
         "distributorsInfo": {
             "description": "List of distributors of this bobbin.",
             "type": "array",
             "items": {
-                "$ref": "../utils.json#/$defs/distributorInfo"
+                "$ref": "https://psma.com/peas/utils.json#/$defs/distributorInfo"
             },
             "uniqueItems": false
         },
@@ -83,6 +83,18 @@
                 "pinout": {
                     "$ref": "#/$defs/pinout"
                 },
+                "orientation": {
+                    "description": "Mounting orientation of the bobbin",
+                    "type": "string",
+                    "enum": [
+                        "horizontal",
+                        "vertical"
+                    ]
+                },
+                "variant": {
+                    "description": "Variant name of the bobbin (e.g. flanged, foot-print)",
+                    "type": "string"
+                },
                 "connections": {
                     "description": "List of connections between windings and pins",
                     "type": "array",
@@ -98,7 +110,8 @@
                                 "description": "The name of the connected winding",
                                 "type": "string"
                             }
-                        }
+                        },
+                        "additionalProperties": false
                     },
                     "minItems": 0,
                     "uniqueItems": true
@@ -109,7 +122,8 @@
                 "family",
                 "shape",
                 "dimensions"
-            ]
+            ],
+            "additionalProperties": false
         },
         "processedDescription": {
             "type": "object",
@@ -182,7 +196,8 @@
                 "columnThickness",
                 "columnDepth",
                 "windingWindows"
-            ]
+            ],
+            "additionalProperties": false
         }
     },
     "anyOf": [
@@ -242,7 +257,8 @@
                 "shape",
                 "type",
                 "dimensions"
-            ]
+            ],
+            "additionalProperties": false
         },
         "pinout": {
             "description": "Data describing the pinout of a bobbin",
@@ -293,11 +309,9 @@
                 }
             },
             "required": [
-                "pitch",
-                "rowDistance",
-                "numberPins",
-                "pinDescription"
-            ]
+                "numberPins"
+            ],
+            "additionalProperties": false
         }
     }
 }

@@ -67,25 +67,41 @@
                 "outputVoltages": {
                     "description": "List of output voltages, one per output. Interpreted per outputVoltagesType (default: dc).",
                     "type": "array",
-                    "items": { "type": "number" },
+                    "items": {
+                        "type": "number"
+                    },
                     "minItems": 1
                 },
                 "outputVoltagesType": {
                     "description": "Type of value carried in outputVoltages. Defaults to dc.",
                     "type": "string",
-                    "enum": ["dc", "rms", "peak", "peakToPeak", "average"],
+                    "enum": [
+                        "dc",
+                        "rms",
+                        "peak",
+                        "peakToPeak",
+                        "average"
+                    ],
                     "default": "dc"
                 },
                 "outputCurrents": {
                     "description": "List of output currents, one per output. Interpreted per outputCurrentsType (default: dc).",
                     "type": "array",
-                    "items": { "type": "number" },
+                    "items": {
+                        "type": "number"
+                    },
                     "minItems": 1
                 },
                 "outputCurrentsType": {
                     "description": "Type of value carried in outputCurrents. Defaults to dc.",
                     "type": "string",
-                    "enum": ["dc", "rms", "peak", "peakToPeak", "average"],
+                    "enum": [
+                        "dc",
+                        "rms",
+                        "peak",
+                        "peakToPeak",
+                        "average"
+                    ],
                     "default": "dc"
                 },
                 "switchingFrequency": {
@@ -105,7 +121,9 @@
                 "outputVoltages",
                 "outputCurrents",
                 "ambientTemperature"
-            ]
+            ],
+            "additionalProperties": false
         }
-    }
+    },
+    "additionalProperties": false
 }

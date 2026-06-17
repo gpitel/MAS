@@ -32,5 +32,6 @@
         "conductingWidth",
         "conductingHeight"
     ],
-    "$defs": {}
+    "$defs": {},
+    "unevaluatedProperties": false
 }

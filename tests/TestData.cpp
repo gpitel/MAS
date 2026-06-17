@@ -10,6 +10,13 @@ using nlohmann::json_uri;
 using nlohmann::json_schema::json_validator;
 using json = nlohmann::json;
 
+// Permissive format checker. In JSON Schema draft 2020-12 `format` is an
+// annotation, not an assertion, unless the format-assertion vocabulary is
+// explicitly enabled. pboettch's validator otherwise throws when a `format`
+// keyword is present and no checker is supplied. PEAS shared schemas use
+// `format` (e.g. uri); MAS schemas that now $ref PEAS must tolerate it.
+static void format_check(const std::string &, const std::string &) {}
+
 
 SUITE(Samples)
 {
@@ -18,7 +25,28 @@ SUITE(Samples)
 
     static void loader(const json_uri & uri, json & schema)
     {
-        std::string filename = mas_path + uri.path();
+        // Map psma.com/<repo>/<path> $id URIs to on-disk schema files. MAS
+        // schemas live under <repo>/schemas/; sibling families (PEAS, CAS, SAS,
+        // RAS, CIAS) live in adjacent repos. The $id authority sweep to
+        // psma.com/<repo>/... requires this mapping; the loader previously
+        // assumed legacy /schemas/... paths. The OS resolves any embedded ".."
+        // segments when the file is opened.
+        const std::string p = uri.path();
+        const std::pair<std::string, std::string> repos[] = {
+            {"/mas/",  "schemas/"},
+            {"/peas/", "../PEAS/schemas/"},
+            {"/cas/",  "../CAS/schemas/"},
+            {"/sas/",  "../SAS/schemas/"},
+            {"/ras/",  "../RAS/schemas/"},
+            {"/cias/", "../CIAS/schemas/"},
+        };
+        std::string filename = mas_path + p;
+        for (const auto & repo : repos) {
+            if (p.rfind(repo.first, 0) == 0) {
+                filename = mas_path + repo.second + p.substr(repo.first.size());
+                break;
+            }
+        }
         std::ifstream lf(filename);
         if (!lf.good())
             throw std::invalid_argument("could not open " + uri.url() + " tried with " + filename);
@@ -52,7 +80,7 @@ SUITE(Samples)
             }
             json shape_schema = json::parse(f);
 
-            json_validator validator(loader);
+            json_validator validator(loader, format_check);
             try
             {
                 validator.set_root_schema(shape_schema);
@@ -159,7 +187,28 @@ SUITE(Data)
 
     static void loader(const json_uri & uri, json & schema)
     {
-        std::string filename = mas_path + uri.path();
+        // Map psma.com/<repo>/<path> $id URIs to on-disk schema files. MAS
+        // schemas live under <repo>/schemas/; sibling families (PEAS, CAS, SAS,
+        // RAS, CIAS) live in adjacent repos. The $id authority sweep to
+        // psma.com/<repo>/... requires this mapping; the loader previously
+        // assumed legacy /schemas/... paths. The OS resolves any embedded ".."
+        // segments when the file is opened.
+        const std::string p = uri.path();
+        const std::pair<std::string, std::string> repos[] = {
+            {"/mas/",  "schemas/"},
+            {"/peas/", "../PEAS/schemas/"},
+            {"/cas/",  "../CAS/schemas/"},
+            {"/sas/",  "../SAS/schemas/"},
+            {"/ras/",  "../RAS/schemas/"},
+            {"/cias/", "../CIAS/schemas/"},
+        };
+        std::string filename = mas_path + p;
+        for (const auto & repo : repos) {
+            if (p.rfind(repo.first, 0) == 0) {
+                filename = mas_path + repo.second + p.substr(repo.first.size());
+                break;
+            }
+        }
         std::ifstream lf(filename);
         if (!lf.good())
             throw std::invalid_argument("could not open " + uri.url() + " tried with " + filename);
@@ -180,7 +229,7 @@ SUITE(Data)
             std::ifstream f(validator);
             json shape_schema = json::parse(f);
 
-            json_validator validator(loader); // create validator
+            json_validator validator(loader, format_check); // create validator
             try
             {
                 validator.set_root_schema(shape_schema); // insert root-schema

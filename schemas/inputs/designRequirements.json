@@ -3,208 +3,132 @@
     "$id": "https://psma.com/mas/inputs/designRequirements.json",
     "$comment": "SPDX-License-Identifier: Apache-2.0",
     "title": "designRequirements",
-    "description": "The list of requirement that must comply a given magnetic",
-    "type": "object",
-    "properties": {
-        "name": {
-            "description": "A label that identifies these Design Requirements",
-            "type": "string"
+    "description": "The list of requirements that a given magnetic must comply with. Built on the shared PEAS designRequirementsBase (name, role, allowedTechnologies, market, topology, operatingTemperature, terminalType, maximumWeight, maximumDimensions, application, subApplication) plus the magnetic-specific requirements below. This makes MAS a PEAS citizen: a MAS designRequirements is also a valid PEAS designRequirementsBase.",
+    "allOf": [
+        {
+            "$ref": "https://psma.com/peas/utils.json#/$defs/designRequirementsBase"
         },
-        "magnetizingInductance": {
-            "description": "Required values for the magnetizing inductance",
-            "$ref": "../utils.json#/$defs/dimensionWithTolerance"
-        },
-        "turnsRatios": {
-            "description": "Required turns ratios between primary and the rest of windings",
-            "type": "array",
-            "items": {
-                "$ref": "../utils.json#/$defs/dimensionWithTolerance"
-            },
-            "minItems": 0
-        },
-        "minimumImpedance": {
-            "description": "List of minimum impedance at given frequency in the primary",
-            "type": "array",
-            "items": {
-                "$ref": "../utils.json#/$defs/impedanceAtFrequency"
-            },
-            "minItems": 1
-        },
-        "leakageInductance": {
-            "description": "Required values for the leakage inductance",
-            "type": "array",
-            "items": {
-                "$ref": "../utils.json#/$defs/dimensionWithTolerance"
-            },
-            "minItems": 0
-        },
-        "strayCapacitance": {
-            "description": "Required values for the stray capacitance",
-            "type": "array",
-            "items": {
-                "$ref": "../utils.json#/$defs/dimensionWithTolerance"
-            },
-            "minItems": 0
-        },
-        "isolationSides": {
-            "description": "Isolation side where each winding is connected to.",
-            "type": "array",
-            "items": {
-                "$ref": "../utils.json#/$defs/isolationSide"
-            },
-            "minItems": 1
-        },
-        "operatingTemperature": {
-            "description": "Required values for the temperature that the magnetic can reach under operating",
-            "$ref": "../utils.json#/$defs/dimensionWithTolerance"
-        },
-        "insulation": {
-            "title": "insulationRequirements",
+        {
             "type": "object",
             "properties": {
-                "altitude": {
-                    "description": "Required values for the altitude",
+                "magnetizingInductance": {
+                    "description": "Required values for the magnetizing inductance",
                     "$ref": "../utils.json#/$defs/dimensionWithTolerance"
                 },
-                "cti": {
-                    "description": "Required CTI",
-                    "type": "string",
-                    "enum": [
-                        "groupI",
-                        "groupII",
-                        "groupIIIA",
-                        "groupIIIB"
-                    ]
-                },
-                "pollutionDegree": {
-                    "description": "Required pollution for the magnetic to work under",
-                    "type": "string",
-                    "enum": [
-                        "PD1",
-                        "PD2",
-                        "PD3",
-                        "PD4"
-                    ]
-                },
-                "overvoltageCategory": {
-                    "description": "Required overvoltage category",
-                    "type": "string",
-                    "enum": [
-                        "I",
-                        "II",
-                        "III",
-                        "IV"
-                    ]
-                },
-                "insulationType": {
-                    "$ref": "../utils.json#/$defs/insulationType"
-                },
-                "mainSupplyVoltage": {
-                    "description": "Voltage RMS of the main supply to which this transformer is connected to.",
-                    "$ref": "../utils.json#/$defs/dimensionWithTolerance"
-                },
-                "standards": {
-                    "description": "List of standards that will be taken into account for insulation.",
+                "turnsRatios": {
+                    "description": "Required turns ratios between primary and the rest of windings",
                     "type": "array",
                     "items": {
-                        "type": "string",
-                        "title": "insulationStandards",
-                        "enum": [
-                            "IEC 60664-1",
-                            "IEC 61558-1",
-                            "IEC 60335-1",
-                            "IEC 62368-1"
-                        ]
+                        "$ref": "../utils.json#/$defs/dimensionWithTolerance"
+                    },
+                    "minItems": 0
+                },
+                "minimumImpedance": {
+                    "description": "List of minimum impedance at given frequency in the primary",
+                    "type": "array",
+                    "items": {
+                        "$ref": "../utils.json#/$defs/impedanceAtFrequency"
                     },
                     "minItems": 1
-                }
-            }
-        },
-        "market": {
-            "description": "Market where the magnetic will end up being used",
-            "type": "string",
-            "enum": [
-                "medical",
-                "commercial",
-                "industrial",
-                "military",
-                "space"
-            ]
-        },
-        "topology": {
-            "description": "Topology that will use the magnetic",
-            "type": "string",
-            "title": "topologies",
-            "enum": [
-                "buckConverter",
-                "boostConverter",
-                "flybackConverter",
-                "activeClampForwardConverter",
-                "singleSwitchForwardConverter",
-                "twoSwitchForwardConverter",
-                "pushPullConverter",
-                "asymmetricHalfBridgeConverter",
-                "phaseShiftedFullBridgeConverter",
-                "phaseShiftedHalfBridgeConverter",
-                "currentTransformer",
-                "isolatedBuckConverter",
-                "isolatedBuckBoostConverter",
-                "dualActiveBridgeConverter",
-                "llcResonantConverter",
-                "cllcResonantConverter",
-                "clllcResonantConverter",
-                "commonModeChoke",
-                "differentialModeChoke",
-                "powerFactorCorrection",
-                "cukConverter",
-                "sepicConverter",
-                "zetaConverter",
-                "weinbergConverter",
-                "fourSwitchBuckBoostConverter",
-                "seriesResonantConverter",
-                "viennaRectifierConverter"
-            ]
-        },
-        "application": {
-            "$ref": "../utils.json#/$defs/application"
-        },
-        "subApplication": {
-            "$ref": "../utils.json#/$defs/subApplication"
-        },
-        "wiringTechnology": {
-            "$ref": "../utils.json#/$defs/wiringTechnology"
-        },
-        "maximumWeight": {
-            "description": "Maximum weight for the designed magnetic, in Kg",
-            "type": "number"
-        },
-        "maximumDimensions": {
-            "description": "Maximum dimensions, width, height, and depth, for the designed magnetic, in m",
-            "type": "object",
-            "properties": {
-                "width": {
-                    "type": "number"
                 },
-                "height": {
-                    "type": "number"
+                "leakageInductance": {
+                    "description": "Required values for the leakage inductance",
+                    "type": "array",
+                    "items": {
+                        "$ref": "../utils.json#/$defs/dimensionWithTolerance"
+                    },
+                    "minItems": 0
                 },
-                "depth": {
-                    "type": "number"
+                "strayCapacitance": {
+                    "description": "Required values for the stray capacitance",
+                    "type": "array",
+                    "items": {
+                        "$ref": "../utils.json#/$defs/dimensionWithTolerance"
+                    },
+                    "minItems": 0
+                },
+                "isolationSides": {
+                    "description": "Isolation side where each winding is connected to.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "../utils.json#/$defs/isolationSide"
+                    },
+                    "minItems": 1
+                },
+                "insulation": {
+                    "title": "insulationRequirements",
+                    "type": "object",
+                    "properties": {
+                        "altitude": {
+                            "description": "Required values for the altitude",
+                            "$ref": "../utils.json#/$defs/dimensionWithTolerance"
+                        },
+                        "cti": {
+                            "description": "Required CTI",
+                            "type": "string",
+                            "enum": [
+                                "groupI",
+                                "groupII",
+                                "groupIIIA",
+                                "groupIIIB"
+                            ]
+                        },
+                        "pollutionDegree": {
+                            "description": "Required pollution for the magnetic to work under",
+                            "type": "string",
+                            "enum": [
+                                "PD1",
+                                "PD2",
+                                "PD3",
+                                "PD4"
+                            ]
+                        },
+                        "overvoltageCategory": {
+                            "description": "Required overvoltage category",
+                            "type": "string",
+                            "enum": [
+                                "I",
+                                "II",
+                                "III",
+                                "IV"
+                            ]
+                        },
+                        "insulationType": {
+                            "$ref": "../utils.json#/$defs/insulationType"
+                        },
+                        "mainSupplyVoltage": {
+                            "description": "Voltage RMS of the main supply to which this transformer is connected to.",
+                            "$ref": "../utils.json#/$defs/dimensionWithTolerance"
+                        },
+                        "standards": {
+                            "description": "List of standards that will be taken into account for insulation.",
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "title": "insulationStandards",
+                                "enum": [
+                                    "IEC 60664-1",
+                                    "IEC 61558-1",
+                                    "IEC 60335-1",
+                                    "IEC 62368-1"
+                                ]
+                            },
+                            "minItems": 1
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "wiringTechnology": {
+                    "$ref": "../utils.json#/$defs/wiringTechnology"
                 }
-            }
-        },
-        "terminalType": {
-            "description": "Type of the terminal that must be used, per winding",
-            "type": "array",
-            "items": {
-                "$ref": "../utils.json#/$defs/connectionType"
-            }
+            },
+            "required": [
+                "magnetizingInductance",
+                "turnsRatios"
+            ]
         }
-    },
-    "required": [
-        "magnetizingInductance",
-        "turnsRatios"
     ],
+    "unevaluatedProperties": false,
     "$defs": {
         "impedancePoint": {
             "description": "Data describing one impendance value",
@@ -228,7 +152,8 @@
             },
             "required": [
                 "magnitude"
-            ]
+            ],
+            "additionalProperties": false
         }
     }
 }

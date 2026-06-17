@@ -30,7 +30,10 @@
         "variant": {
             "description": "Primary topology variant: 'classic' (V1 push-pull, 2 switches; switch V_DS = 2*Vin/(1-D)) or 'bridge' (V2 H-bridge, 4 switches; switch V_DS = Vin).",
             "type": "string",
-            "enum": ["classic", "bridge"],
+            "enum": [
+                "classic",
+                "bridge"
+            ],
             "default": "classic"
         },
         "synchronousRectifier": {
@@ -72,5 +75,6 @@
                 }
             ]
         }
-    }
+    },
+    "additionalProperties": false
 }

@@ -84,5 +84,6 @@
     "required": [
         "type",
         "family"
-    ]
+    ],
+    "additionalProperties": false
 }

@@ -102,14 +102,17 @@
                         "viennaRectifier": {
                             "$ref": "./inputs/topologies/vienna.json"
                         }
-                    }
+                    },
+                    "additionalProperties": false
                 }
-            }
+            },
+            "additionalProperties": false
         }
     },
     "required": [
         "operatingPoints",
         "designRequirements"
     ],
-    "$defs": {}
+    "$defs": {},
+    "additionalProperties": false
 }

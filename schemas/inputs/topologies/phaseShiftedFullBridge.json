@@ -80,9 +80,11 @@
                     },
                     "required": [
                         "phaseShift"
-                    ]
+                    ],
+                    "additionalProperties": false
                 }
             ]
         }
-    }
+    },
+    "additionalProperties": false
 }

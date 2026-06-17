@@ -65,18 +65,11 @@
                 "outputCurrents",
                 "switchingFrequency",
                 "ambientTemperature"
-            ]
+            ],
+            "additionalProperties": false
         },
         "insulationType": {
-            "description": "Required type of insulation",
-            "type": "string",
-            "enum": [
-                "functional",
-                "basic",
-                "supplementary",
-                "double",
-                "reinforced"
-            ]
+            "$ref": "https://psma.com/peas/utils.json#/$defs/isolationClass"
         },
         "wiringTechnology": {
             "description": "Technology that must be used to create the wiring",
@@ -89,14 +82,7 @@
             ]
         },
         "application": {
-            "description": "Application of the magnetic, can be Power, Signal Processing, or Interference Suppression",
-            "title": "application",
-            "type": "string",
-            "enum": [
-                "power",
-                "signalProcessing",
-                "interferenceSuppression"
-            ]
+            "$ref": "https://psma.com/peas/utils.json#/$defs/magneticApplication"
         },
         "applications": {
             "description": "List of applications a magnetic material can serve",
@@ -109,16 +95,7 @@
             "uniqueItems": true
         },
         "subApplication": {
-            "description": "Sub application of the magnetic, can be Power Filtering, Transforming, Isolation, Common Mode Noise Filtering, Differential Mode Noise Filtering",
-            "title": "subApplication",
-            "type": "string",
-            "enum": [
-                "powerFiltering",
-                "transforming",
-                "isolation",
-                "commonModeNoiseFiltering",
-                "differentialModeNoiseFiltering"
-            ]
+            "$ref": "https://psma.com/peas/utils.json#/$defs/magneticSubApplication"
         },
         "resistivityPoint": {
             "description": "data for describing one point of resistivity",
@@ -192,13 +169,13 @@
                     "type": "string"
                 },
                 "cost": {
-                    "description": "The manufacturer's reference price for this part.",
-                    "$ref": "#/$defs/cost"
+                    "$ref": "https://psma.com/peas/utils.json#/$defs/currencyAmount"
                 }
             },
             "required": [
                 "name"
-            ]
+            ],
+            "additionalProperties": false
         },
         "distributorInfo": {
             "description": "Data from the distributor for a given part",
@@ -292,7 +269,7 @@
             "maxItems": 3
         },
         "coordinates": {
-            "description": "Coordinates in 2D or 3D space. Interpretation depends on the sibling coordinateSystem (default: cartesian). Cartesian: (x, y) or (x, y, z). Polar (2D only): (r, theta). Cylindrical (3D only): (r, theta, z) \u2014 natural for toroidal geometry.",
+            "description": "Coordinates in 2D or 3D space. Interpretation depends on the sibling coordinateSystem (default: cartesian). Cartesian: (x, y) or (x, y, z). Polar (2D only): (r, theta). Cylindrical (3D only): (r, theta, z) — natural for toroidal geometry.",
             "type": "array",
             "items": {
                 "type": "number"
@@ -301,7 +278,7 @@
             "maxItems": 3
         },
         "dimensions": {
-            "description": "Dimensions in 2D or 3D space. Interpretation depends on the sibling coordinateSystem (default: cartesian). Cartesian: (x, y) or (x, y, z). Polar (2D only): (r, theta). Cylindrical (3D only): (r, theta, z) \u2014 natural for toroidal geometry.",
+            "description": "Dimensions in 2D or 3D space. Interpretation depends on the sibling coordinateSystem (default: cartesian). Cartesian: (x, y) or (x, y, z). Polar (2D only): (r, theta). Cylindrical (3D only): (r, theta, z) — natural for toroidal geometry.",
             "type": "array",
             "items": {
                 "type": "number"
@@ -310,15 +287,9 @@
             "maxItems": 3
         },
         "velocity": {
-            "description": "Data describing a velocity in cartesian 2 or 3 dimensional space",
-            "type": "array",
-            "items": {
-                "type": "number"
-            },
-            "minItems": 2,
-            "maxItems": 3
+            "$ref": "https://psma.com/peas/utils.json#/$defs/velocity"
         },
-        "twoDimensionalMatrix": {
+        "toleranceMatrix": {
             "description": "Data a two dimensional matrix, created as an array of array, where the first coordinate in the X and the second the Y",
             "type": "object",
             "additionalProperties": {
@@ -329,54 +300,7 @@
             }
         },
         "dimensionWithTolerance": {
-            "description": "A dimension of with minimum, nominal, and maximum values",
-            "title": "dimensionWithTolerance",
-            "type": "object",
-            "properties": {
-                "minimum": {
-                    "description": "The minimum value of the dimension",
-                    "type": "number"
-                },
-                "nominal": {
-                    "description": "The nominal value of the dimension",
-                    "type": "number"
-                },
-                "maximum": {
-                    "description": "The maximum value of the dimension",
-                    "type": "number"
-                },
-                "excludeMinimum": {
-                    "description": "True if the minimum value must be excluded from the range",
-                    "type": "boolean",
-                    "default": false
-                },
-                "excludeMaximum": {
-                    "description": "True if the maximum value must be excluded from the range",
-                    "type": "boolean",
-                    "default": false
-                },
-                "unit": {
-                    "description": "Optional SI unit string (e.g. 'H', 'F', 'V', 'A', 'Ohm', 'm', 'kg'). When absent, the unit is implied by the field name.",
-                    "type": "string"
-                }
-            },
-            "anyOf": [
-                {
-                    "required": [
-                        "minimum"
-                    ]
-                },
-                {
-                    "required": [
-                        "nominal"
-                    ]
-                },
-                {
-                    "required": [
-                        "maximum"
-                    ]
-                }
-            ]
+            "$ref": "https://psma.com/peas/utils.json#/$defs/dimensionWithTolerance"
         },
         "dimension": {
             "description": "A dimension that can be either a simple number or a dimensionWithTolerance",
@@ -401,17 +325,7 @@
             ]
         },
         "connectionType": {
-            "description": "Type of the terminal",
-            "title": "connectionType",
-            "type": "string",
-            "enum": [
-                "pin",
-                "screw",
-                "smt",
-                "flyingLead",
-                "tht",
-                "pcbPad"
-            ]
+            "$ref": "https://psma.com/peas/utils.json#/$defs/connectionType"
         },
         "complexFieldPoint": {
             "description": "Data describing the complex value of a field in a 2D or 3D space",
@@ -471,7 +385,8 @@
             "required": [
                 "frequency",
                 "data"
-            ]
+            ],
+            "additionalProperties": false
         },
         "fieldPoint": {
             "description": "Data describing the value of a field in a 2D or 3D space",
@@ -531,10 +446,11 @@
             "required": [
                 "frequency",
                 "data"
-            ]
+            ],
+            "additionalProperties": false
         },
         "coordinateSystem": {
-            "description": "System in which dimensions and coordinates are expressed. Cartesian: (x, y) or (x, y, z). Polar: (r, theta) \u2014 2D only. Cylindrical: (r, theta, z) \u2014 3D only, natural for toroidal cores. Spherical is not used in magnetic-component description.",
+            "description": "System in which dimensions and coordinates are expressed. Cartesian: (x, y) or (x, y, z). Polar: (r, theta) — 2D only. Cylindrical: (r, theta, z) — 3D only, natural for toroidal cores. Spherical is not used in magnetic-component description.",
             "title": "coordinateSystem",
             "type": "string",
             "enum": [

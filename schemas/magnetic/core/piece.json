@@ -83,7 +83,9 @@
             "required": [
                 "length",
                 "coordinates"
-            ]
+            ],
+            "additionalProperties": false
         }
-    }
+    },
+    "additionalProperties": false
 }
