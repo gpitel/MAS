@@ -545,6 +545,12 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
+                "rs": {
+                    "description": "Series resistance in Ohms",
+                    "type": [
+                        "number"
+                    ]
+                },
                 "rp": {
                     "description": "Parallel resistance in Ohms",
                     "type": [
