@@ -57,8 +57,14 @@
                     "$ref": "#/$defs/magneticDatasheetPart"
                 },
                 "electrical": {
-                    "description": "Electrical characteristics as stated in the datasheet. Covers transformers, coupled inductors, common-mode chokes and chip beads; populate only the fields the datasheet provides.",
-                    "$ref": "#/$defs/magneticDatasheetElectrical"
+                    "description": "Electrical characteristics as stated in the datasheet, specialised per magnetic subtype. The required `type` field selects the variant; each variant only permits the fields meaningful for that subtype.",
+                    "oneOf": [
+                        {"$ref": "#/$defs/magneticDatasheetInductorElectrical"},
+                        {"$ref": "#/$defs/magneticDatasheetCoupledInductorElectrical"},
+                        {"$ref": "#/$defs/magneticDatasheetTransformerElectrical"},
+                        {"$ref": "#/$defs/magneticDatasheetCommonModeChokeElectrical"},
+                        {"$ref": "#/$defs/magneticDatasheetChipBeadElectrical"}
+                    ]
                 },
                 "thermal": {
                     "description": "Operating temperature range from the datasheet.",
@@ -77,8 +83,10 @@
                     "$ref": "#/$defs/magneticDatasheetBusiness"
                 },
                 "model": {
-                    "description": "Circuit model parameters for SPICE simulation.",
-                    "$ref": "#/$defs/magneticDatasheetModelParamsChipBead"
+                    "description": "Circuit model parameters for SPICE simulation, specialised per magnetic subtype. The required `type` field selects the variant. Only the chip-bead model is defined so far; transformer / inductor variants can be added to this oneOf.",
+                    "oneOf": [
+                        {"$ref": "#/$defs/magneticDatasheetChipBeadModel"}
+                    ]
                 }
             },
             "additionalProperties": false
@@ -141,236 +149,435 @@
             },
             "additionalProperties": false
         },
-        "magneticDatasheetElectrical": {
-            "description": "Electrical characteristics as stated in the datasheet.",
+        "magneticDatasheetImpedancePoint": {
+            "title": "DatasheetImpedancePoint",
+            "description": "Impedance vs. frequency point from the datasheet, optionally parameterised by DC bias current. The magnitude goes in impedance.magnitude; phase / real / imaginary parts are optional.",
             "type": "object",
             "properties": {
+                "impedance": {
+                    "description": "Impedance value. Uses the same impedancePoint structure as designRequirements.",
+                    "$ref": "./inputs/designRequirements.json#/$defs/impedancePoint"
+                },
+                "frequency": {
+                    "description": "Frequency in Hz.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "current": {
+                    "description": "DC bias current in Amperes at which this point was measured (chip beads / DC-biased parts).",
+                    "type": "number",
+                    "minimum": 0
+                }
+            },
+            "required": [
+                "impedance",
+                "frequency"
+            ],
+            "additionalProperties": false
+        },
+        "magneticDatasheetResistancePoint": {
+            "title": "DatasheetResistancePoint",
+            "description": "Resistance vs. frequency point from the datasheet, optionally parameterised by DC bias current.",
+            "type": "object",
+            "properties": {
+                "resistance": {
+                    "description": "Resistance value in Ohms.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "frequency": {
+                    "description": "Frequency in Hz.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "current": {
+                    "description": "DC bias current in Amperes at which this point was measured.",
+                    "type": "number",
+                    "minimum": 0
+                }
+            },
+            "required": [
+                "resistance",
+                "frequency"
+            ],
+            "additionalProperties": false
+        },
+        "magneticDatasheetReactancePoint": {
+            "title": "DatasheetReactancePoint",
+            "description": "Reactance vs. frequency point from the datasheet, optionally parameterised by DC bias current.",
+            "type": "object",
+            "properties": {
+                "reactance": {
+                    "description": "Reactance value in Ohms.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "frequency": {
+                    "description": "Frequency in Hz.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "current": {
+                    "description": "DC bias current in Amperes at which this point was measured.",
+                    "type": "number",
+                    "minimum": 0
+                }
+            },
+            "required": [
+                "reactance",
+                "frequency"
+            ],
+            "additionalProperties": false
+        },
+        "magneticDatasheetPulsePoint": {
+            "title": "DatasheetPulsePoint",
+            "description": "Maximum pulse current vs. pulse length point from the datasheet.",
+            "type": "object",
+            "properties": {
+                "pulseCurrent": {
+                    "description": "Pulse current value in Amperes.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "pulseLength": {
+                    "description": "Pulse length in seconds.",
+                    "type": "number",
+                    "minimum": 0
+                }
+            },
+            "required": [
+                "pulseCurrent",
+                "pulseLength"
+            ],
+            "additionalProperties": false
+        },
+        "magneticDatasheetNumberPulsesPoint": {
+            "title": "DatasheetNumberPulsesPoint",
+            "description": "Number of pulses vs. maximum pulse current point from the datasheet.",
+            "type": "object",
+            "properties": {
+                "numberPulses": {
+                    "description": "Number of pulses.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "pulseCurrent": {
+                    "description": "Pulse current value in Amperes.",
+                    "type": "number",
+                    "minimum": 0
+                }
+            },
+            "required": [
+                "numberPulses",
+                "pulseCurrent"
+            ],
+            "additionalProperties": false
+        },
+        "magneticDatasheetDcResistanceEntry": {
+            "title": "DatasheetDcResistanceEntry",
+            "description": "DC resistance of one named winding, for multi-winding parts.",
+            "type": "object",
+            "properties": {
+                "winding": {
+                    "description": "Winding name this resistance applies to.",
+                    "type": "string"
+                },
+                "resistance": {
+                    "description": "DC resistance in Ohms.",
+                    "type": "number",
+                    "minimum": 0
+                }
+            },
+            "required": [
+                "winding",
+                "resistance"
+            ],
+            "additionalProperties": false
+        },
+        "magneticDatasheetInductorElectrical": {
+            "title": "MagneticDatasheetInductorElectrical",
+            "description": "Datasheet electrical characteristics of a single-winding inductor.",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "description": "Discriminator selecting this electrical variant.",
+                    "const": "inductor"
+                },
+                "inductance": {
+                    "description": "Inductance in Henries, with tolerance.",
+                    "$ref": "./utils.json#/$defs/dimensionWithTolerance"
+                },
+                "dcResistance": {
+                    "description": "DC resistance in Ohms. nominal = typical value, maximum = datasheet max.",
+                    "$ref": "./utils.json#/$defs/dimensionWithTolerance"
+                },
+                "ratedCurrent": {
+                    "description": "Rated DC current in Amperes.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "saturationCurrentPeak": {
+                    "description": "Peak saturation current in Amperes (I_sat from datasheet).",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "selfResonantFrequency": {
+                    "description": "Self-resonant frequency in Hz.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "impedancePoints": {
+                    "description": "Impedance vs. frequency points (RF / high-frequency inductors).",
+                    "type": "array",
+                    "items": {"$ref": "#/$defs/magneticDatasheetImpedancePoint"}
+                },
+                "maximumImpedance": {
+                    "description": "Peak / maximum impedance magnitude in Ohms.",
+                    "type": "number",
+                    "minimum": 0
+                }
+            },
+            "required": ["type"],
+            "additionalProperties": false
+        },
+        "magneticDatasheetCoupledInductorElectrical": {
+            "title": "MagneticDatasheetCoupledInductorElectrical",
+            "description": "Datasheet electrical characteristics of a multi-winding coupled inductor.",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "description": "Discriminator selecting this electrical variant.",
+                    "const": "coupledInductor"
+                },
                 "inductance": {
                     "description": "Inductance per winding in Henries, with tolerance.",
                     "$ref": "./utils.json#/$defs/dimensionWithTolerance"
                 },
-                "dcResistance": {
-                    "description": "DC resistance per winding in Ohms. nominal = typical value, maximum = datasheet max.",
-                    "$ref": "./utils.json#/$defs/dimensionWithTolerance"
+                "dcResistances": {
+                    "description": "DC resistance per winding.",
+                    "type": "array",
+                    "items": {"$ref": "#/$defs/magneticDatasheetDcResistanceEntry"}
                 },
                 "ratedCurrent": {
                     "description": "Rated DC current per winding in Amperes.",
-                    "type": "number"
+                    "type": "number",
+                    "minimum": 0
+                },
+                "saturationCurrentPeak": {
+                    "description": "Peak saturation current in Amperes (I_sat from datasheet).",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "selfResonantFrequency": {
+                    "description": "Self-resonant frequency in Hz.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "turnsRatios": {
+                    "description": "Turns ratios between the primary and each other winding (primary turns / winding turns), one entry per secondary. Uses the same array-of-dimensionWithTolerance shape as designRequirements.turnsRatios.",
+                    "type": "array",
+                    "items": {"$ref": "./utils.json#/$defs/dimensionWithTolerance"},
+                    "minItems": 0
+                },
+                "couplingCoefficient": {
+                    "description": "Magnetic coupling coefficient k (0-1).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "leakageInductance": {
+                    "description": "Leakage inductance in Henries.",
+                    "$ref": "./utils.json#/$defs/dimensionWithTolerance"
+                }
+            },
+            "required": ["type"],
+            "additionalProperties": false
+        },
+        "magneticDatasheetTransformerElectrical": {
+            "title": "MagneticDatasheetTransformerElectrical",
+            "description": "Datasheet electrical characteristics of a transformer.",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "description": "Discriminator selecting this electrical variant.",
+                    "const": "transformer"
+                },
+                "inductance": {
+                    "description": "Magnetizing inductance in Henries, with tolerance.",
+                    "$ref": "./utils.json#/$defs/dimensionWithTolerance"
+                },
+                "dcResistances": {
+                    "description": "DC resistance per winding.",
+                    "type": "array",
+                    "items": {"$ref": "#/$defs/magneticDatasheetDcResistanceEntry"}
+                },
+                "ratedCurrent": {
+                    "description": "Rated DC current per winding in Amperes.",
+                    "type": "number",
+                    "minimum": 0
                 },
                 "ratedVoltageDC": {
                     "description": "Maximum rated DC voltage between any two terminals in Volts.",
-                    "type": "number"
+                    "type": "number",
+                    "minimum": 0
                 },
                 "ratedVoltageAC": {
                     "description": "Maximum rated AC voltage (RMS) between windings in Volts.",
-                    "type": "number"
+                    "type": "number",
+                    "minimum": 0
                 },
                 "insulationTestVoltageAC": {
                     "description": "Hi-pot / dielectric withstand test voltage (AC RMS) in Volts.",
-                    "type": "number"
+                    "type": "number",
+                    "minimum": 0
                 },
                 "insulationResistance": {
                     "description": "Minimum insulation resistance between windings in Ohms.",
-                    "type": "number"
+                    "type": "number",
+                    "minimum": 0
                 },
                 "leakageInductance": {
                     "description": "Leakage inductance in Henries.",
                     "$ref": "./utils.json#/$defs/dimensionWithTolerance"
                 },
-                "impedancePoints": {
-                    "description": "Impedance vs. frequency points from the datasheet, optionally parameterised by DC bias current. The magnitude goes in impedance.magnitude; phase / real / imaginary parts are optional. Uses the same impedancePoint structure as designRequirements.minimumImpedance.",
+                "turnsRatios": {
+                    "description": "Turns ratios between the primary and each other winding (primary turns / winding turns), one entry per secondary. Uses the same array-of-dimensionWithTolerance shape as designRequirements.turnsRatios.",
                     "type": "array",
-                    "items": {
-                        "type": "object",
-                        "title": "DatasheetImpedancePoint",
-                        "properties": {
-                            "impedance": {
-                                "description": "Impedance value. Uses the same impedancePoint structure as designRequirements.",
-                                "$ref": "./inputs/designRequirements.json#/$defs/impedancePoint"
-                            },
-                            "frequency": {
-                                "description": "Frequency in Hz.",
-                                "type": "number",
-                                "minimum": 0
-                            },
-                            "current": {
-                                "description": "DC bias current in Amperes at which this point was measured (chip beads / DC-biased parts).",
-                                "type": "number",
-                                "minimum": 0
-                            }
-                        },
-                        "required": [
-                            "impedance",
-                            "frequency"
-                        ],
-                        "additionalProperties": false
-                    }
+                    "items": {"$ref": "./utils.json#/$defs/dimensionWithTolerance"},
+                    "minItems": 0
                 },
-                "maximumImpedance": {
-                    "description": "Peak / maximum impedance magnitude in Ohms (frequency not specified in datasheet).",
-                    "type": "number"
+                "couplingCoefficient": {
+                    "description": "Magnetic coupling coefficient k (0-1).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                },
+                "selfResonantFrequency": {
+                    "description": "Self-resonant frequency in Hz.",
+                    "type": "number",
+                    "minimum": 0
+                }
+            },
+            "required": ["type"],
+            "additionalProperties": false
+        },
+        "magneticDatasheetCommonModeChokeElectrical": {
+            "title": "MagneticDatasheetCommonModeChokeElectrical",
+            "description": "Datasheet electrical characteristics of a common-mode choke.",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "description": "Discriminator selecting this electrical variant.",
+                    "const": "commonModeChoke"
+                },
+                "dcResistances": {
+                    "description": "DC resistance per line / winding.",
+                    "type": "array",
+                    "items": {"$ref": "#/$defs/magneticDatasheetDcResistanceEntry"}
+                },
+                "ratedCurrent": {
+                    "description": "Rated DC current per line in Amperes.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "ratedVoltageDC": {
+                    "description": "Maximum rated DC voltage between any two terminals in Volts.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "ratedVoltageAC": {
+                    "description": "Maximum rated AC voltage (RMS) between windings in Volts.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "insulationTestVoltageAC": {
+                    "description": "Hi-pot / dielectric withstand test voltage (AC RMS) in Volts.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "insulationResistance": {
+                    "description": "Minimum insulation resistance between windings in Ohms.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "leakageInductance": {
+                    "description": "Differential-mode (leakage) inductance in Henries.",
+                    "$ref": "./utils.json#/$defs/dimensionWithTolerance"
+                },
+                "impedancePoints": {
+                    "description": "Common-mode impedance vs. frequency points.",
+                    "type": "array",
+                    "items": {"$ref": "#/$defs/magneticDatasheetImpedancePoint"}
                 },
                 "commonModeFilter": {
                     "description": "Common-mode filter performance figures from the datasheet.",
                     "$ref": "#/$defs/magneticDatasheetCommonModeFilter"
                 },
-                "saturationCurrentPeak": {
-                    "description": "Peak saturation current in Amperes (I_sat from datasheet).",
-                    "type": "number"
-                },
                 "selfResonantFrequency": {
                     "description": "Self-resonant frequency in Hz.",
-                    "type": "number"
+                    "type": "number",
+                    "minimum": 0
+                }
+            },
+            "required": ["type"],
+            "additionalProperties": false
+        },
+        "magneticDatasheetChipBeadElectrical": {
+            "title": "MagneticDatasheetChipBeadElectrical",
+            "description": "Datasheet electrical characteristics of a chip bead (ferrite bead).",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "description": "Discriminator selecting this electrical variant.",
+                    "const": "chipBead"
                 },
-                "turnsRatios": {
-                    "description": "Turns ratios between the primary and each other winding (primary turns / winding turns), one entry per secondary. An array so multi-secondary transformers / coupled inductors are representable, with tolerance per ratio. Uses the same array-of-dimensionWithTolerance shape as designRequirements.turnsRatios.",
+                "dcResistance": {
+                    "description": "DC resistance in Ohms. nominal = typical value, maximum = datasheet max.",
+                    "$ref": "./utils.json#/$defs/dimensionWithTolerance"
+                },
+                "ratedCurrent": {
+                    "description": "Rated DC current in Amperes.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "impedancePoints": {
+                    "description": "Impedance vs. frequency points, optionally parameterised by DC bias current.",
                     "type": "array",
-                    "items": {
-                        "$ref": "./utils.json#/$defs/dimensionWithTolerance"
-                    },
-                    "minItems": 0
-                },
-                "couplingCoefficient": {
-                    "description": "Magnetic coupling coefficient k (0\u20131).",
-                    "type": "number"
-                },
-                "dcResistances": {
-                    "description": "DC resistance per winding for multi-winding parts. Use dcResistance for single-winding parts.",
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "winding": {
-                                "type": "string"
-                            },
-                            "resistance": {
-                                "type": "number"
-                            }
-                        },
-                        "required": [
-                            "winding",
-                            "resistance"
-                        ],
-                        "additionalProperties": false
-                    }
+                    "items": {"$ref": "#/$defs/magneticDatasheetImpedancePoint"}
                 },
                 "resistancePoints": {
-                    "description": "Resistance vs. frequency points from the datasheet, optionally parameterised by DC bias current.",
+                    "description": "Resistance vs. frequency points, optionally parameterised by DC bias current.",
                     "type": "array",
-                    "items": {
-                        "type": "object",
-                        "title": "DatasheetResistancePoint",
-                        "properties": {
-                            "resistance": {
-                                "description": "Resistance value.",
-                                "type": "number",
-                                "minimum": 0
-                            },
-                            "frequency": {
-                                "description": "Frequency in Hz.",
-                                "type": "number",
-                                "minimum": 0
-                            },
-                            "current": {
-                                "description": "DC bias current in Amperes at which this point was measured.",
-                                "type": "number",
-                                "minimum": 0
-                            }
-                        },
-                        "required": [
-                            "resistance",
-                            "frequency"
-                        ],
-                        "additionalProperties": false
-                    }
+                    "items": {"$ref": "#/$defs/magneticDatasheetResistancePoint"}
                 },
                 "reactancePoints": {
-                    "description": "Reactance vs. frequency points from the datasheet, optionally parameterised by DC bias current.",
+                    "description": "Reactance vs. frequency points, optionally parameterised by DC bias current.",
                     "type": "array",
-                    "items": {
-                        "type": "object",
-                        "title": "DatasheetReactancePoint",
-                        "properties": {
-                            "reactance": {
-                                "description": "Reactance value.",
-                                "type": "number",
-                                "minimum": 0
-                            },
-                            "frequency": {
-                                "description": "Frequency in Hz.",
-                                "type": "number",
-                                "minimum": 0
-                            },
-                            "current": {
-                                "description": "DC bias current in Amperes at which this point was measured.",
-                                "type": "number",
-                                "minimum": 0
-                            }
-                        },
-                        "required": [
-                            "reactance",
-                            "frequency"
-                        ],
-                        "additionalProperties": false
-                    }
+                    "items": {"$ref": "#/$defs/magneticDatasheetReactancePoint"}
                 },
                 "pulsePoints": {
-                    "description": "Maximum pulse current vs. pulse length points from the datasheet.",
+                    "description": "Maximum pulse current vs. pulse length points.",
                     "type": "array",
-                    "items": {
-                        "type": "object",
-                        "title": "DatasheetPulsePoint",
-                        "properties": {
-                            "pulseCurrent": {
-                                "description": "Pulse current value.",
-                                "type": "number",
-                                "minimum": 0
-                            },
-                            "pulseLength": {
-                                "description": "Pulse length in seconds.",
-                                "type": "number",
-                                "minimum": 0
-                            }
-                        },
-                        "required": [
-                            "pulseCurrent",
-                            "pulseLength"
-                        ],
-                        "additionalProperties": false
-                    }
+                    "items": {"$ref": "#/$defs/magneticDatasheetPulsePoint"}
                 },
                 "numberPulsesPoints": {
-                    "description": "Number of pulses vs. maximum pulse current points from the datasheet.",
+                    "description": "Number of pulses vs. maximum pulse current points.",
                     "type": "array",
-                    "items": {
-                        "type": "object",
-                        "title": "DatasheetNumberPulsesPoint",
-                        "properties": {
-                            "numberPulses": {
-                                "description": "Number of pulses.",
-                                "type": "number",
-                                "minimum": 0
-                            },
-                            "pulseCurrent": {
-                                "description": "Pulse current value.",
-                                "type": "number",
-                                "minimum": 0
-                            }
-                        },
-                        "required": [
-                            "numberPulses",
-                            "pulseCurrent"
-                        ],
-                        "additionalProperties": false
-                    }
+                    "items": {"$ref": "#/$defs/magneticDatasheetNumberPulsesPoint"}
                 },
                 "impedanceTolerance": {
-                    "description": "Tolerance on the impedance values in the datasheet, expressed as a percentage (e.g. 20 means ±20%).",
+                    "description": "Tolerance on the impedance values, expressed as a percentage (e.g. 20 means +/-20%).",
                     "type": "number",
                     "minimum": 0,
                     "maximum": 100
+                },
+                "selfResonantFrequency": {
+                    "description": "Self-resonant frequency in Hz.",
+                    "type": "number",
+                    "minimum": 0
                 }
             },
+            "required": ["type"],
             "additionalProperties": false
         },
         "magneticDatasheetApplication": {
@@ -497,37 +704,35 @@
             },
             "additionalProperties": false
         },
-        "magneticDatasheetModelParamsChipBead": {
-            "description": "Circuit model parameters for SPICE simulation of Chip Beads",
+        "magneticDatasheetChipBeadModel": {
+            "title": "MagneticDatasheetChipBeadModel",
+            "description": "Circuit model parameters for SPICE simulation of chip beads (series R in series with a parallel R-L-C).",
             "type": "object",
             "additionalProperties": false,
             "properties": {
+                "type": {
+                    "description": "Discriminator selecting this model variant.",
+                    "const": "chipBead"
+                },
                 "rs": {
                     "description": "Series resistance in Ohms",
-                    "type": [
-                        "number"
-                    ]
+                    "type": "number"
                 },
                 "rp": {
                     "description": "Parallel resistance in Ohms",
-                    "type": [
-                        "number"
-                    ]
+                    "type": "number"
                 },
                 "cp": {
                     "description": "Parallel capacitance in Farads",
-                    "type": [
-                        "number"
-                    ]
+                    "type": "number"
                 },
                 "lp": {
                     "description": "Parallel inductance in Henries",
-                    "type": [
-                        "number"
-                    ]
+                    "type": "number"
                 }
             },
             "required": [
+                "type",
                 "rp",
                 "cp",
                 "lp"
