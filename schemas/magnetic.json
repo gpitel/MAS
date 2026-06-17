@@ -467,10 +467,6 @@
                 "selfResonantFrequency": {
                     "description": "Self-resonant frequency in Hz.",
                     "type": "number"
-                },
-                "numberLines": {
-                    "description": "Number of lines.",
-                    "type": "number"
                 }
             },
             "additionalProperties": false
