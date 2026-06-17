@@ -248,6 +248,10 @@
                 "internal": {
                     "description": "True if the component is internal (not public).",
                     "type": "boolean"
+                },
+                "internalNote": {
+                    "description": "A note about the internal status of the component.",
+                    "type": "string"
                 }
             },
             "required": [
