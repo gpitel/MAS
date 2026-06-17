@@ -57,7 +57,7 @@
                     "$ref": "#/$defs/magneticDatasheetPart"
                 },
                 "electrical": {
-                    "description": "Electrical characteristics as stated in the datasheet, specialised per magnetic subtype. The required `type` field selects the variant; each variant only permits the fields meaningful for that subtype.",
+                    "description": "Electrical characteristics as stated in the datasheet, specialised per magnetic subtype. The required `subtype` field selects the variant; each variant only permits the fields meaningful for that subtype.",
                     "oneOf": [
                         {"$ref": "#/$defs/magneticDatasheetInductorElectrical"},
                         {"$ref": "#/$defs/magneticDatasheetCoupledInductorElectrical"},
@@ -83,7 +83,7 @@
                     "$ref": "#/$defs/magneticDatasheetBusiness"
                 },
                 "model": {
-                    "description": "Circuit model parameters for SPICE simulation, specialised per magnetic subtype. The required `type` field selects the variant. Only the chip-bead model is defined so far; transformer / inductor variants can be added to this oneOf.",
+                    "description": "Circuit model parameters for SPICE simulation, specialised per magnetic subtype. The required `subtype` field selects the variant. Only the chip-bead model is defined so far; transformer / inductor variants can be added to this oneOf.",
                     "oneOf": [
                         {"$ref": "#/$defs/magneticDatasheetChipBeadModel"}
                     ]
@@ -167,6 +167,10 @@
                     "description": "DC bias current in Amperes at which this point was measured (chip beads / DC-biased parts).",
                     "type": "number",
                     "minimum": 0
+                },
+                "winding": {
+                    "description": "Winding / array element this point applies to (e.g. element of a bead array). Omit for single-winding parts.",
+                    "type": "string"
                 }
             },
             "required": [
@@ -194,6 +198,10 @@
                     "description": "DC bias current in Amperes at which this point was measured.",
                     "type": "number",
                     "minimum": 0
+                },
+                "winding": {
+                    "description": "Winding / array element this point applies to (e.g. element of a bead array). Omit for single-winding parts.",
+                    "type": "string"
                 }
             },
             "required": [
@@ -221,6 +229,10 @@
                     "description": "DC bias current in Amperes at which this point was measured.",
                     "type": "number",
                     "minimum": 0
+                },
+                "winding": {
+                    "description": "Winding / array element this point applies to (e.g. element of a bead array). Omit for single-winding parts.",
+                    "type": "string"
                 }
             },
             "required": [
@@ -243,6 +255,10 @@
                     "description": "Pulse length in seconds.",
                     "type": "number",
                     "minimum": 0
+                },
+                "winding": {
+                    "description": "Winding / array element this point applies to (e.g. element of a bead array). Omit for single-winding parts.",
+                    "type": "string"
                 }
             },
             "required": [
@@ -265,6 +281,10 @@
                     "description": "Pulse current value in Amperes.",
                     "type": "number",
                     "minimum": 0
+                },
+                "winding": {
+                    "description": "Winding / array element this point applies to (e.g. element of a bead array). Omit for single-winding parts.",
+                    "type": "string"
                 }
             },
             "required": [
@@ -273,33 +293,12 @@
             ],
             "additionalProperties": false
         },
-        "magneticDatasheetDcResistanceEntry": {
-            "title": "DatasheetDcResistanceEntry",
-            "description": "DC resistance of one named winding, for multi-winding parts.",
-            "type": "object",
-            "properties": {
-                "winding": {
-                    "description": "Winding name this resistance applies to.",
-                    "type": "string"
-                },
-                "resistance": {
-                    "description": "DC resistance in Ohms.",
-                    "type": "number",
-                    "minimum": 0
-                }
-            },
-            "required": [
-                "winding",
-                "resistance"
-            ],
-            "additionalProperties": false
-        },
         "magneticDatasheetInductorElectrical": {
             "title": "MagneticDatasheetInductorElectrical",
             "description": "Datasheet electrical characteristics of a single-winding inductor.",
             "type": "object",
             "properties": {
-                "type": {
+                "subtype": {
                     "description": "Discriminator selecting this electrical variant.",
                     "const": "inductor"
                 },
@@ -311,10 +310,10 @@
                     "description": "DC resistance in Ohms. nominal = typical value, maximum = datasheet max.",
                     "$ref": "./utils.json#/$defs/dimensionWithTolerance"
                 },
-                "ratedCurrent": {
-                    "description": "Rated DC current in Amperes.",
-                    "type": "number",
-                    "minimum": 0
+                "ratedCurrents": {
+                    "description": "Rated DC current, as a single-entry array.",
+                    "type": "array",
+                    "items": {"type": "number", "minimum": 0}
                 },
                 "saturationCurrentPeak": {
                     "description": "Peak saturation current in Amperes (I_sat from datasheet).",
@@ -337,7 +336,7 @@
                     "minimum": 0
                 }
             },
-            "required": ["type"],
+            "required": ["subtype"],
             "additionalProperties": false
         },
         "magneticDatasheetCoupledInductorElectrical": {
@@ -345,7 +344,7 @@
             "description": "Datasheet electrical characteristics of a multi-winding coupled inductor.",
             "type": "object",
             "properties": {
-                "type": {
+                "subtype": {
                     "description": "Discriminator selecting this electrical variant.",
                     "const": "coupledInductor"
                 },
@@ -356,12 +355,12 @@
                 "dcResistances": {
                     "description": "DC resistance per winding.",
                     "type": "array",
-                    "items": {"$ref": "#/$defs/magneticDatasheetDcResistanceEntry"}
+                    "items": {"$ref": "./utils.json#/$defs/dimensionWithTolerance"}
                 },
-                "ratedCurrent": {
-                    "description": "Rated DC current per winding in Amperes.",
-                    "type": "number",
-                    "minimum": 0
+                "ratedCurrents": {
+                    "description": "Rated DC current per winding (one entry per winding; a single-entry array for a single rated value).",
+                    "type": "array",
+                    "items": {"type": "number", "minimum": 0}
                 },
                 "saturationCurrentPeak": {
                     "description": "Peak saturation current in Amperes (I_sat from datasheet).",
@@ -390,7 +389,7 @@
                     "$ref": "./utils.json#/$defs/dimensionWithTolerance"
                 }
             },
-            "required": ["type"],
+            "required": ["subtype"],
             "additionalProperties": false
         },
         "magneticDatasheetTransformerElectrical": {
@@ -398,7 +397,7 @@
             "description": "Datasheet electrical characteristics of a transformer.",
             "type": "object",
             "properties": {
-                "type": {
+                "subtype": {
                     "description": "Discriminator selecting this electrical variant.",
                     "const": "transformer"
                 },
@@ -409,12 +408,12 @@
                 "dcResistances": {
                     "description": "DC resistance per winding.",
                     "type": "array",
-                    "items": {"$ref": "#/$defs/magneticDatasheetDcResistanceEntry"}
+                    "items": {"$ref": "./utils.json#/$defs/dimensionWithTolerance"}
                 },
-                "ratedCurrent": {
-                    "description": "Rated DC current per winding in Amperes.",
-                    "type": "number",
-                    "minimum": 0
+                "ratedCurrents": {
+                    "description": "Rated DC current per winding (one entry per winding; a single-entry array for a single rated value).",
+                    "type": "array",
+                    "items": {"type": "number", "minimum": 0}
                 },
                 "ratedVoltageDC": {
                     "description": "Maximum rated DC voltage between any two terminals in Volts.",
@@ -458,7 +457,7 @@
                     "minimum": 0
                 }
             },
-            "required": ["type"],
+            "required": ["subtype"],
             "additionalProperties": false
         },
         "magneticDatasheetCommonModeChokeElectrical": {
@@ -466,19 +465,19 @@
             "description": "Datasheet electrical characteristics of a common-mode choke.",
             "type": "object",
             "properties": {
-                "type": {
+                "subtype": {
                     "description": "Discriminator selecting this electrical variant.",
                     "const": "commonModeChoke"
                 },
                 "dcResistances": {
                     "description": "DC resistance per line / winding.",
                     "type": "array",
-                    "items": {"$ref": "#/$defs/magneticDatasheetDcResistanceEntry"}
+                    "items": {"$ref": "./utils.json#/$defs/dimensionWithTolerance"}
                 },
-                "ratedCurrent": {
-                    "description": "Rated DC current per line in Amperes.",
-                    "type": "number",
-                    "minimum": 0
+                "ratedCurrents": {
+                    "description": "Rated DC current per line (one entry per line; a single-entry array for a single rated value).",
+                    "type": "array",
+                    "items": {"type": "number", "minimum": 0}
                 },
                 "ratedVoltageDC": {
                     "description": "Maximum rated DC voltage between any two terminals in Volts.",
@@ -519,7 +518,7 @@
                     "minimum": 0
                 }
             },
-            "required": ["type"],
+            "required": ["subtype"],
             "additionalProperties": false
         },
         "magneticDatasheetChipBeadElectrical": {
@@ -527,7 +526,7 @@
             "description": "Datasheet electrical characteristics of a chip bead (ferrite bead).",
             "type": "object",
             "properties": {
-                "type": {
+                "subtype": {
                     "description": "Discriminator selecting this electrical variant.",
                     "const": "chipBead"
                 },
@@ -535,10 +534,10 @@
                     "description": "DC resistance in Ohms. nominal = typical value, maximum = datasheet max.",
                     "$ref": "./utils.json#/$defs/dimensionWithTolerance"
                 },
-                "ratedCurrent": {
-                    "description": "Rated DC current in Amperes.",
-                    "type": "number",
-                    "minimum": 0
+                "ratedCurrents": {
+                    "description": "Rated DC current per element (one entry per element of a bead array; a single-entry array for a single bead).",
+                    "type": "array",
+                    "items": {"type": "number", "minimum": 0}
                 },
                 "impedancePoints": {
                     "description": "Impedance vs. frequency points, optionally parameterised by DC bias current.",
@@ -577,7 +576,7 @@
                     "minimum": 0
                 }
             },
-            "required": ["type"],
+            "required": ["subtype"],
             "additionalProperties": false
         },
         "magneticDatasheetApplication": {
@@ -710,7 +709,7 @@
             "type": "object",
             "additionalProperties": false,
             "properties": {
-                "type": {
+                "subtype": {
                     "description": "Discriminator selecting this model variant.",
                     "const": "chipBead"
                 },
@@ -732,7 +731,7 @@
                 }
             },
             "required": [
-                "type",
+                "subtype",
                 "rp",
                 "cp",
                 "lp"
