@@ -57,14 +57,17 @@
                     "$ref": "#/$defs/magneticDatasheetPart"
                 },
                 "electrical": {
-                    "description": "Electrical characteristics as stated in the datasheet, specialised per magnetic subtype. The required `subtype` field selects the variant; each variant only permits the fields meaningful for that subtype.",
-                    "oneOf": [
-                        {"$ref": "#/$defs/magneticDatasheetInductorElectrical"},
-                        {"$ref": "#/$defs/magneticDatasheetCoupledInductorElectrical"},
-                        {"$ref": "#/$defs/magneticDatasheetTransformerElectrical"},
-                        {"$ref": "#/$defs/magneticDatasheetCommonModeChokeElectrical"},
-                        {"$ref": "#/$defs/magneticDatasheetChipBeadElectrical"}
-                    ]
+                    "description": "Electrical characteristics as stated in the datasheet, one entry per connection configuration. A part with a single configuration has a one-entry array; parts that can be wired several ways (e.g. a multiline suppression bead used as common-mode choke, series inductor, etc.) have one entry per wiring. In each entry the required `subtype` selects the variant, `name` / `numberTurns` describe the configuration, and the remaining fields are the electrical characteristics for that wiring.",
+                    "type": "array",
+                    "items": {
+                        "oneOf": [
+                            {"$ref": "#/$defs/magneticDatasheetInductorElectrical"},
+                            {"$ref": "#/$defs/magneticDatasheetCoupledInductorElectrical"},
+                            {"$ref": "#/$defs/magneticDatasheetTransformerElectrical"},
+                            {"$ref": "#/$defs/magneticDatasheetCommonModeChokeElectrical"},
+                            {"$ref": "#/$defs/magneticDatasheetChipBeadElectrical"}
+                        ]
+                    }
                 },
                 "thermal": {
                     "description": "Operating temperature range from the datasheet.",
@@ -302,6 +305,15 @@
                     "description": "Discriminator selecting this electrical variant.",
                     "const": "inductor"
                 },
+                "name": {
+                    "description": "Label of this connection configuration as given in the datasheet (e.g. '4 x current compensated', '4 turns'). Omit for a part with a single configuration.",
+                    "type": "string"
+                },
+                "numberTurns": {
+                    "description": "Effective number of turns for this connection configuration.",
+                    "type": "number",
+                    "minimum": 0
+                },
                 "inductance": {
                     "description": "Inductance in Henries, with tolerance.",
                     "$ref": "./utils.json#/$defs/dimensionWithTolerance"
@@ -347,6 +359,15 @@
                 "subtype": {
                     "description": "Discriminator selecting this electrical variant.",
                     "const": "coupledInductor"
+                },
+                "name": {
+                    "description": "Label of this connection configuration as given in the datasheet (e.g. '4 x current compensated', '4 turns'). Omit for a part with a single configuration.",
+                    "type": "string"
+                },
+                "numberTurns": {
+                    "description": "Effective number of turns for this connection configuration.",
+                    "type": "number",
+                    "minimum": 0
                 },
                 "inductance": {
                     "description": "Inductance per winding in Henries, with tolerance.",
@@ -400,6 +421,15 @@
                 "subtype": {
                     "description": "Discriminator selecting this electrical variant.",
                     "const": "transformer"
+                },
+                "name": {
+                    "description": "Label of this connection configuration as given in the datasheet (e.g. '4 x current compensated', '4 turns'). Omit for a part with a single configuration.",
+                    "type": "string"
+                },
+                "numberTurns": {
+                    "description": "Effective number of turns for this connection configuration.",
+                    "type": "number",
+                    "minimum": 0
                 },
                 "inductance": {
                     "description": "Magnetizing inductance in Henries, with tolerance.",
@@ -469,6 +499,15 @@
                     "description": "Discriminator selecting this electrical variant.",
                     "const": "commonModeChoke"
                 },
+                "name": {
+                    "description": "Label of this connection configuration as given in the datasheet (e.g. '4 x current compensated', '4 turns'). Omit for a part with a single configuration.",
+                    "type": "string"
+                },
+                "numberTurns": {
+                    "description": "Effective number of turns for this connection configuration.",
+                    "type": "number",
+                    "minimum": 0
+                },
                 "dcResistances": {
                     "description": "DC resistance per line / winding.",
                     "type": "array",
@@ -529,6 +568,15 @@
                 "subtype": {
                     "description": "Discriminator selecting this electrical variant.",
                     "const": "chipBead"
+                },
+                "name": {
+                    "description": "Label of this connection configuration as given in the datasheet (e.g. '4 x current compensated', '4 turns'). Omit for a part with a single configuration.",
+                    "type": "string"
+                },
+                "numberTurns": {
+                    "description": "Effective number of turns for this connection configuration.",
+                    "type": "number",
+                    "minimum": 0
                 },
                 "dcResistance": {
                     "description": "DC resistance in Ohms. nominal = typical value, maximum = datasheet max.",
