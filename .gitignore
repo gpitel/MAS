@@ -121,3 +121,6 @@ website/package-lock.json
 
 *.egg-info
 *.so
+
+# generated quicktype C++ binding — regenerate from schemas/ (see BUILD.md), not committed
+/MAS.hpp
