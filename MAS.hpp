@@ -305,6 +305,10 @@ namespace MAS {
      *
      * Body length in metres.
      *
+     * Pin length in metres.
+     *
+     * Body weight in kilograms.
+     *
      * Body width in metres.
      *
      * Operating temperature in degrees Celsius.
@@ -4762,6 +4766,8 @@ namespace MAS {
         std::optional<std::string> country;
         std::optional<std::string> distributed_area;
         std::optional<std::string> email;
+        std::optional<bool> internal;
+        std::optional<std::string> internal_note;
         std::optional<std::string> link;
         std::string name;
         std::optional<std::string> phone;
@@ -4793,6 +4799,18 @@ namespace MAS {
          */
         std::optional<std::string> get_email() const { return email; }
         void set_email(std::optional<std::string> value) { this->email = value; }
+
+        /**
+         * True if the component is internal (not public).
+         */
+        std::optional<bool> get_internal() const { return internal; }
+        void set_internal(std::optional<bool> value) { this->internal = value; }
+
+        /**
+         * A note about the internal status of the component.
+         */
+        std::optional<std::string> get_internal_note() const { return internal_note; }
+        void set_internal_note(std::optional<std::string> value) { this->internal_note = value; }
 
         /**
          * The distributor's link
@@ -8482,16 +8500,26 @@ namespace MAS {
     class DatasheetImpedancePoint {
         public:
         DatasheetImpedancePoint() :
+            current_constraint(std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt),
             frequency_constraint(std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt)
         {}
         virtual ~DatasheetImpedancePoint() = default;
 
         private:
+        std::optional<double> current;
+        ClassMemberConstraints current_constraint;
         double frequency;
         ClassMemberConstraints frequency_constraint;
         ImpedancePoint impedance;
 
         public:
+        /**
+         * DC bias current in Amperes at which this point was measured (chip beads / DC-biased
+         * parts).
+         */
+        std::optional<double> get_current() const { return current; }
+        void set_current(std::optional<double> value) { if (value) CheckConstraint("current", current_constraint, *value); this->current = value; }
+
         /**
          * Frequency in Hz.
          */
@@ -8507,12 +8535,156 @@ namespace MAS {
         void set_impedance(const ImpedancePoint & value) { this->impedance = value; }
     };
 
+    class DatasheetNumberPulsesPoint {
+        public:
+        DatasheetNumberPulsesPoint() :
+            number_pulses_constraint(std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt),
+            pulse_current_constraint(std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt)
+        {}
+        virtual ~DatasheetNumberPulsesPoint() = default;
+
+        private:
+        double number_pulses;
+        ClassMemberConstraints number_pulses_constraint;
+        double pulse_current;
+        ClassMemberConstraints pulse_current_constraint;
+
+        public:
+        /**
+         * Number of pulses.
+         */
+        const double & get_number_pulses() const { return number_pulses; }
+        double & get_mutable_number_pulses() { return number_pulses; }
+        void set_number_pulses(const double & value) { CheckConstraint("number_pulses", number_pulses_constraint, value); this->number_pulses = value; }
+
+        /**
+         * Pulse current value.
+         */
+        const double & get_pulse_current() const { return pulse_current; }
+        double & get_mutable_pulse_current() { return pulse_current; }
+        void set_pulse_current(const double & value) { CheckConstraint("pulse_current", pulse_current_constraint, value); this->pulse_current = value; }
+    };
+
+    class DatasheetPulsePoint {
+        public:
+        DatasheetPulsePoint() :
+            pulse_current_constraint(std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt),
+            pulse_length_constraint(std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt)
+        {}
+        virtual ~DatasheetPulsePoint() = default;
+
+        private:
+        double pulse_current;
+        ClassMemberConstraints pulse_current_constraint;
+        double pulse_length;
+        ClassMemberConstraints pulse_length_constraint;
+
+        public:
+        /**
+         * Pulse current value.
+         */
+        const double & get_pulse_current() const { return pulse_current; }
+        double & get_mutable_pulse_current() { return pulse_current; }
+        void set_pulse_current(const double & value) { CheckConstraint("pulse_current", pulse_current_constraint, value); this->pulse_current = value; }
+
+        /**
+         * Pulse length in seconds.
+         */
+        const double & get_pulse_length() const { return pulse_length; }
+        double & get_mutable_pulse_length() { return pulse_length; }
+        void set_pulse_length(const double & value) { CheckConstraint("pulse_length", pulse_length_constraint, value); this->pulse_length = value; }
+    };
+
+    class DatasheetReactancePoint {
+        public:
+        DatasheetReactancePoint() :
+            current_constraint(std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt),
+            frequency_constraint(std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt),
+            reactance_constraint(std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt)
+        {}
+        virtual ~DatasheetReactancePoint() = default;
+
+        private:
+        std::optional<double> current;
+        ClassMemberConstraints current_constraint;
+        double frequency;
+        ClassMemberConstraints frequency_constraint;
+        double reactance;
+        ClassMemberConstraints reactance_constraint;
+
+        public:
+        /**
+         * DC bias current in Amperes at which this point was measured.
+         */
+        std::optional<double> get_current() const { return current; }
+        void set_current(std::optional<double> value) { if (value) CheckConstraint("current", current_constraint, *value); this->current = value; }
+
+        /**
+         * Frequency in Hz.
+         */
+        const double & get_frequency() const { return frequency; }
+        double & get_mutable_frequency() { return frequency; }
+        void set_frequency(const double & value) { CheckConstraint("frequency", frequency_constraint, value); this->frequency = value; }
+
+        /**
+         * Reactance value.
+         */
+        const double & get_reactance() const { return reactance; }
+        double & get_mutable_reactance() { return reactance; }
+        void set_reactance(const double & value) { CheckConstraint("reactance", reactance_constraint, value); this->reactance = value; }
+    };
+
+    class DatasheetResistancePoint {
+        public:
+        DatasheetResistancePoint() :
+            current_constraint(std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt),
+            frequency_constraint(std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt),
+            resistance_constraint(std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt)
+        {}
+        virtual ~DatasheetResistancePoint() = default;
+
+        private:
+        std::optional<double> current;
+        ClassMemberConstraints current_constraint;
+        double frequency;
+        ClassMemberConstraints frequency_constraint;
+        double resistance;
+        ClassMemberConstraints resistance_constraint;
+
+        public:
+        /**
+         * DC bias current in Amperes at which this point was measured.
+         */
+        std::optional<double> get_current() const { return current; }
+        void set_current(std::optional<double> value) { if (value) CheckConstraint("current", current_constraint, *value); this->current = value; }
+
+        /**
+         * Frequency in Hz.
+         */
+        const double & get_frequency() const { return frequency; }
+        double & get_mutable_frequency() { return frequency; }
+        void set_frequency(const double & value) { CheckConstraint("frequency", frequency_constraint, value); this->frequency = value; }
+
+        /**
+         * Resistance value.
+         */
+        const double & get_resistance() const { return resistance; }
+        double & get_mutable_resistance() { return resistance; }
+        void set_resistance(const double & value) { CheckConstraint("resistance", resistance_constraint, value); this->resistance = value; }
+    };
+
     /**
+     * Electrical characteristics as stated in the datasheet. Covers transformers, coupled
+     * inductors, common-mode chokes and chip beads; populate only the fields the datasheet
+     * provides.
+     *
      * Electrical characteristics as stated in the datasheet.
      */
     class Electrical {
         public:
-        Electrical() = default;
+        Electrical() :
+            impedance_tolerance_constraint(std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt, std::nullopt)
+        {}
         virtual ~Electrical() = default;
 
         private:
@@ -8521,17 +8693,23 @@ namespace MAS {
         std::optional<DimensionWithTolerance> dc_resistance;
         std::optional<std::vector<DcResistance>> dc_resistances;
         std::optional<std::vector<DatasheetImpedancePoint>> impedance_points;
+        std::optional<double> impedance_tolerance;
+        ClassMemberConstraints impedance_tolerance_constraint;
         std::optional<DimensionWithTolerance> inductance;
         std::optional<double> insulation_resistance;
         std::optional<double> insulation_test_voltage_ac;
         std::optional<DimensionWithTolerance> leakage_inductance;
         std::optional<double> maximum_impedance;
+        std::optional<std::vector<DatasheetNumberPulsesPoint>> number_pulses_points;
+        std::optional<std::vector<DatasheetPulsePoint>> pulse_points;
         std::optional<double> rated_current;
         std::optional<double> rated_voltage_ac;
         std::optional<double> rated_voltage_dc;
+        std::optional<std::vector<DatasheetReactancePoint>> reactance_points;
+        std::optional<std::vector<DatasheetResistancePoint>> resistance_points;
         std::optional<double> saturation_current_peak;
         std::optional<double> self_resonant_frequency;
-        std::optional<double> turns_ratio;
+        std::optional<std::vector<DimensionWithTolerance>> turns_ratios;
 
         public:
         /**
@@ -8560,11 +8738,19 @@ namespace MAS {
         void set_dc_resistances(std::optional<std::vector<DcResistance>> value) { this->dc_resistances = value; }
 
         /**
-         * Impedance vs. frequency points from the datasheet. Uses the same impedanceAtFrequency
-         * structure as designRequirements.minimumImpedance.
+         * Impedance vs. frequency points from the datasheet, optionally parameterised by DC bias
+         * current. The magnitude goes in impedance.magnitude; phase / real / imaginary parts are
+         * optional. Uses the same impedancePoint structure as designRequirements.minimumImpedance.
          */
         std::optional<std::vector<DatasheetImpedancePoint>> get_impedance_points() const { return impedance_points; }
         void set_impedance_points(std::optional<std::vector<DatasheetImpedancePoint>> value) { this->impedance_points = value; }
+
+        /**
+         * Tolerance on the impedance values in the datasheet, expressed as a percentage (e.g. 20
+         * means ±20%).
+         */
+        std::optional<double> get_impedance_tolerance() const { return impedance_tolerance; }
+        void set_impedance_tolerance(std::optional<double> value) { if (value) CheckConstraint("impedance_tolerance", impedance_tolerance_constraint, *value); this->impedance_tolerance = value; }
 
         /**
          * Inductance per winding in Henries, with tolerance.
@@ -8597,6 +8783,18 @@ namespace MAS {
         void set_maximum_impedance(std::optional<double> value) { this->maximum_impedance = value; }
 
         /**
+         * Number of pulses vs. maximum pulse current points from the datasheet.
+         */
+        std::optional<std::vector<DatasheetNumberPulsesPoint>> get_number_pulses_points() const { return number_pulses_points; }
+        void set_number_pulses_points(std::optional<std::vector<DatasheetNumberPulsesPoint>> value) { this->number_pulses_points = value; }
+
+        /**
+         * Maximum pulse current vs. pulse length points from the datasheet.
+         */
+        std::optional<std::vector<DatasheetPulsePoint>> get_pulse_points() const { return pulse_points; }
+        void set_pulse_points(std::optional<std::vector<DatasheetPulsePoint>> value) { this->pulse_points = value; }
+
+        /**
          * Rated DC current per winding in Amperes.
          */
         std::optional<double> get_rated_current() const { return rated_current; }
@@ -8615,6 +8813,20 @@ namespace MAS {
         void set_rated_voltage_dc(std::optional<double> value) { this->rated_voltage_dc = value; }
 
         /**
+         * Reactance vs. frequency points from the datasheet, optionally parameterised by DC bias
+         * current.
+         */
+        std::optional<std::vector<DatasheetReactancePoint>> get_reactance_points() const { return reactance_points; }
+        void set_reactance_points(std::optional<std::vector<DatasheetReactancePoint>> value) { this->reactance_points = value; }
+
+        /**
+         * Resistance vs. frequency points from the datasheet, optionally parameterised by DC bias
+         * current.
+         */
+        std::optional<std::vector<DatasheetResistancePoint>> get_resistance_points() const { return resistance_points; }
+        void set_resistance_points(std::optional<std::vector<DatasheetResistancePoint>> value) { this->resistance_points = value; }
+
+        /**
          * Peak saturation current in Amperes (I_sat from datasheet).
          */
         std::optional<double> get_saturation_current_peak() const { return saturation_current_peak; }
@@ -8627,10 +8839,13 @@ namespace MAS {
         void set_self_resonant_frequency(std::optional<double> value) { this->self_resonant_frequency = value; }
 
         /**
-         * Turns ratio (e.g. 100 means 1:100) for coupled inductors / transformers.
+         * Turns ratios between the primary and each other winding (primary turns / winding turns),
+         * one entry per secondary. An array so multi-secondary transformers / coupled inductors are
+         * representable, with tolerance per ratio. Uses the same array-of-dimensionWithTolerance
+         * shape as designRequirements.turnsRatios.
          */
-        std::optional<double> get_turns_ratio() const { return turns_ratio; }
-        void set_turns_ratio(std::optional<double> value) { this->turns_ratio = value; }
+        std::optional<std::vector<DimensionWithTolerance>> get_turns_ratios() const { return turns_ratios; }
+        void set_turns_ratios(std::optional<std::vector<DimensionWithTolerance>> value) { this->turns_ratios = value; }
     };
 
     /**
@@ -8644,13 +8859,22 @@ namespace MAS {
         virtual ~Mechanical() = default;
 
         private:
+        std::optional<std::string> assembly_type;
         std::optional<DimensionWithTolerance> diameter;
         std::optional<DimensionWithTolerance> height;
         std::optional<DimensionWithTolerance> length;
         std::optional<ConnectionType> mounting;
+        std::optional<DimensionWithTolerance> pin_length;
+        std::optional<DimensionWithTolerance> weight;
         std::optional<DimensionWithTolerance> width;
 
         public:
+        /**
+         * Assembly type (e.g. 'SMT', 'Through-hole').
+         */
+        std::optional<std::string> get_assembly_type() const { return assembly_type; }
+        void set_assembly_type(std::optional<std::string> value) { this->assembly_type = value; }
+
         /**
          * Body diameter in metres (for cylindrical parts).
          */
@@ -8676,10 +8900,67 @@ namespace MAS {
         void set_mounting(std::optional<ConnectionType> value) { this->mounting = value; }
 
         /**
+         * Pin length in metres.
+         */
+        std::optional<DimensionWithTolerance> get_pin_length() const { return pin_length; }
+        void set_pin_length(std::optional<DimensionWithTolerance> value) { this->pin_length = value; }
+
+        /**
+         * Body weight in kilograms.
+         */
+        std::optional<DimensionWithTolerance> get_weight() const { return weight; }
+        void set_weight(std::optional<DimensionWithTolerance> value) { this->weight = value; }
+
+        /**
          * Body width in metres.
          */
         std::optional<DimensionWithTolerance> get_width() const { return width; }
         void set_width(std::optional<DimensionWithTolerance> value) { this->width = value; }
+    };
+
+    /**
+     * Circuit model parameters for SPICE simulation.
+     *
+     * Circuit model parameters for SPICE simulation of Chip Beads
+     */
+    class Model {
+        public:
+        Model() = default;
+        virtual ~Model() = default;
+
+        private:
+        double cp;
+        double lp;
+        double rp;
+        std::optional<double> rs;
+
+        public:
+        /**
+         * Parallel capacitance in Farads
+         */
+        const double & get_cp() const { return cp; }
+        double & get_mutable_cp() { return cp; }
+        void set_cp(const double & value) { this->cp = value; }
+
+        /**
+         * Parallel inductance in Henries
+         */
+        const double & get_lp() const { return lp; }
+        double & get_mutable_lp() { return lp; }
+        void set_lp(const double & value) { this->lp = value; }
+
+        /**
+         * Parallel resistance in Ohms
+         */
+        const double & get_rp() const { return rp; }
+        double & get_mutable_rp() { return rp; }
+        void set_rp(const double & value) { this->rp = value; }
+
+        /**
+         * Series resistance in Ohms
+         */
+        std::optional<double> get_rs() const { return rs; }
+        void set_rs(std::optional<double> value) { this->rs = value; }
     };
 
     /**
@@ -8823,6 +9104,7 @@ namespace MAS {
         std::optional<Business> business;
         std::optional<Electrical> electrical;
         std::optional<Mechanical> mechanical;
+        std::optional<Model> model;
         std::optional<Part> part;
         std::optional<Thermal> thermal;
 
@@ -8841,7 +9123,9 @@ namespace MAS {
         void set_business(std::optional<Business> value) { this->business = value; }
 
         /**
-         * Electrical characteristics as stated in the datasheet.
+         * Electrical characteristics as stated in the datasheet. Covers transformers, coupled
+         * inductors, common-mode chokes and chip beads; populate only the fields the datasheet
+         * provides.
          */
         std::optional<Electrical> get_electrical() const { return electrical; }
         void set_electrical(std::optional<Electrical> value) { this->electrical = value; }
@@ -8851,6 +9135,12 @@ namespace MAS {
          */
         std::optional<Mechanical> get_mechanical() const { return mechanical; }
         void set_mechanical(std::optional<Mechanical> value) { this->mechanical = value; }
+
+        /**
+         * Circuit model parameters for SPICE simulation.
+         */
+        std::optional<Model> get_model() const { return model; }
+        void set_model(std::optional<Model> value) { this->model = value; }
 
         /**
          * Basic part identification from the datasheet.
@@ -8965,8 +9255,8 @@ namespace MAS {
         virtual ~Magnetic() = default;
 
         private:
-        Coil coil;
-        MagneticCore core;
+        std::optional<Coil> coil;
+        std::optional<MagneticCore> core;
         std::optional<std::vector<DistributorInfo>> distributors_info;
         std::optional<MagneticManufacturerInfo> manufacturer_info;
         std::optional<std::vector<double>> rotation;
@@ -8975,16 +9265,14 @@ namespace MAS {
         /**
          * Data describing the coil
          */
-        const Coil & get_coil() const { return coil; }
-        Coil & get_mutable_coil() { return coil; }
-        void set_coil(const Coil & value) { this->coil = value; }
+        std::optional<Coil> get_coil() const { return coil; }
+        void set_coil(std::optional<Coil> value) { this->coil = value; }
 
         /**
          * Data describing the magnetic core.
          */
-        const MagneticCore & get_core() const { return core; }
-        MagneticCore & get_mutable_core() { return core; }
-        void set_core(const MagneticCore & value) { this->core = value; }
+        std::optional<MagneticCore> get_core() const { return core; }
+        void set_core(std::optional<MagneticCore> value) { this->core = value; }
 
         /**
          * The lists of distributors of the magnetic
@@ -10823,11 +11111,26 @@ void to_json(json & j, const DcResistance & x);
 void from_json(const json & j, DatasheetImpedancePoint & x);
 void to_json(json & j, const DatasheetImpedancePoint & x);
 
+void from_json(const json & j, DatasheetNumberPulsesPoint & x);
+void to_json(json & j, const DatasheetNumberPulsesPoint & x);
+
+void from_json(const json & j, DatasheetPulsePoint & x);
+void to_json(json & j, const DatasheetPulsePoint & x);
+
+void from_json(const json & j, DatasheetReactancePoint & x);
+void to_json(json & j, const DatasheetReactancePoint & x);
+
+void from_json(const json & j, DatasheetResistancePoint & x);
+void to_json(json & j, const DatasheetResistancePoint & x);
+
 void from_json(const json & j, Electrical & x);
 void to_json(json & j, const Electrical & x);
 
 void from_json(const json & j, Mechanical & x);
 void to_json(json & j, const Mechanical & x);
+
+void from_json(const json & j, Model & x);
+void to_json(json & j, const Model & x);
 
 void from_json(const json & j, Part & x);
 void to_json(json & j, const Part & x);
@@ -12487,6 +12790,8 @@ namespace MAS {
         x.set_country(get_stack_optional<std::string>(j, "country"));
         x.set_distributed_area(get_stack_optional<std::string>(j, "distributedArea"));
         x.set_email(get_stack_optional<std::string>(j, "email"));
+        x.set_internal(get_stack_optional<bool>(j, "internal"));
+        x.set_internal_note(get_stack_optional<std::string>(j, "internalNote"));
         x.set_link(get_stack_optional<std::string>(j, "link"));
         x.set_name(j.at("name").get<std::string>());
         x.set_phone(get_stack_optional<std::string>(j, "phone"));
@@ -12501,6 +12806,8 @@ namespace MAS {
         j["country"] = x.get_country();
         j["distributedArea"] = x.get_distributed_area();
         j["email"] = x.get_email();
+        j["internal"] = x.get_internal();
+        j["internalNote"] = x.get_internal_note();
         j["link"] = x.get_link();
         j["name"] = x.get_name();
         j["phone"] = x.get_phone();
@@ -13652,14 +13959,64 @@ namespace MAS {
     }
 
     inline void from_json(const json & j, DatasheetImpedancePoint& x) {
+        x.set_current(get_stack_optional<double>(j, "current"));
         x.set_frequency(j.at("frequency").get<double>());
         x.set_impedance(j.at("impedance").get<ImpedancePoint>());
     }
 
     inline void to_json(json & j, const DatasheetImpedancePoint & x) {
         j = json::object();
+        j["current"] = x.get_current();
         j["frequency"] = x.get_frequency();
         j["impedance"] = x.get_impedance();
+    }
+
+    inline void from_json(const json & j, DatasheetNumberPulsesPoint& x) {
+        x.set_number_pulses(j.at("numberPulses").get<double>());
+        x.set_pulse_current(j.at("pulseCurrent").get<double>());
+    }
+
+    inline void to_json(json & j, const DatasheetNumberPulsesPoint & x) {
+        j = json::object();
+        j["numberPulses"] = x.get_number_pulses();
+        j["pulseCurrent"] = x.get_pulse_current();
+    }
+
+    inline void from_json(const json & j, DatasheetPulsePoint& x) {
+        x.set_pulse_current(j.at("pulseCurrent").get<double>());
+        x.set_pulse_length(j.at("pulseLength").get<double>());
+    }
+
+    inline void to_json(json & j, const DatasheetPulsePoint & x) {
+        j = json::object();
+        j["pulseCurrent"] = x.get_pulse_current();
+        j["pulseLength"] = x.get_pulse_length();
+    }
+
+    inline void from_json(const json & j, DatasheetReactancePoint& x) {
+        x.set_current(get_stack_optional<double>(j, "current"));
+        x.set_frequency(j.at("frequency").get<double>());
+        x.set_reactance(j.at("reactance").get<double>());
+    }
+
+    inline void to_json(json & j, const DatasheetReactancePoint & x) {
+        j = json::object();
+        j["current"] = x.get_current();
+        j["frequency"] = x.get_frequency();
+        j["reactance"] = x.get_reactance();
+    }
+
+    inline void from_json(const json & j, DatasheetResistancePoint& x) {
+        x.set_current(get_stack_optional<double>(j, "current"));
+        x.set_frequency(j.at("frequency").get<double>());
+        x.set_resistance(j.at("resistance").get<double>());
+    }
+
+    inline void to_json(json & j, const DatasheetResistancePoint & x) {
+        j = json::object();
+        j["current"] = x.get_current();
+        j["frequency"] = x.get_frequency();
+        j["resistance"] = x.get_resistance();
     }
 
     inline void from_json(const json & j, Electrical& x) {
@@ -13668,17 +14025,22 @@ namespace MAS {
         x.set_dc_resistance(get_stack_optional<DimensionWithTolerance>(j, "dcResistance"));
         x.set_dc_resistances(get_stack_optional<std::vector<DcResistance>>(j, "dcResistances"));
         x.set_impedance_points(get_stack_optional<std::vector<DatasheetImpedancePoint>>(j, "impedancePoints"));
+        x.set_impedance_tolerance(get_stack_optional<double>(j, "impedanceTolerance"));
         x.set_inductance(get_stack_optional<DimensionWithTolerance>(j, "inductance"));
         x.set_insulation_resistance(get_stack_optional<double>(j, "insulationResistance"));
         x.set_insulation_test_voltage_ac(get_stack_optional<double>(j, "insulationTestVoltageAC"));
         x.set_leakage_inductance(get_stack_optional<DimensionWithTolerance>(j, "leakageInductance"));
         x.set_maximum_impedance(get_stack_optional<double>(j, "maximumImpedance"));
+        x.set_number_pulses_points(get_stack_optional<std::vector<DatasheetNumberPulsesPoint>>(j, "numberPulsesPoints"));
+        x.set_pulse_points(get_stack_optional<std::vector<DatasheetPulsePoint>>(j, "pulsePoints"));
         x.set_rated_current(get_stack_optional<double>(j, "ratedCurrent"));
         x.set_rated_voltage_ac(get_stack_optional<double>(j, "ratedVoltageAC"));
         x.set_rated_voltage_dc(get_stack_optional<double>(j, "ratedVoltageDC"));
+        x.set_reactance_points(get_stack_optional<std::vector<DatasheetReactancePoint>>(j, "reactancePoints"));
+        x.set_resistance_points(get_stack_optional<std::vector<DatasheetResistancePoint>>(j, "resistancePoints"));
         x.set_saturation_current_peak(get_stack_optional<double>(j, "saturationCurrentPeak"));
         x.set_self_resonant_frequency(get_stack_optional<double>(j, "selfResonantFrequency"));
-        x.set_turns_ratio(get_stack_optional<double>(j, "turnsRatio"));
+        x.set_turns_ratios(get_stack_optional<std::vector<DimensionWithTolerance>>(j, "turnsRatios"));
     }
 
     inline void to_json(json & j, const Electrical & x) {
@@ -13688,34 +14050,60 @@ namespace MAS {
         j["dcResistance"] = x.get_dc_resistance();
         j["dcResistances"] = x.get_dc_resistances();
         j["impedancePoints"] = x.get_impedance_points();
+        j["impedanceTolerance"] = x.get_impedance_tolerance();
         j["inductance"] = x.get_inductance();
         j["insulationResistance"] = x.get_insulation_resistance();
         j["insulationTestVoltageAC"] = x.get_insulation_test_voltage_ac();
         j["leakageInductance"] = x.get_leakage_inductance();
         j["maximumImpedance"] = x.get_maximum_impedance();
+        j["numberPulsesPoints"] = x.get_number_pulses_points();
+        j["pulsePoints"] = x.get_pulse_points();
         j["ratedCurrent"] = x.get_rated_current();
         j["ratedVoltageAC"] = x.get_rated_voltage_ac();
         j["ratedVoltageDC"] = x.get_rated_voltage_dc();
+        j["reactancePoints"] = x.get_reactance_points();
+        j["resistancePoints"] = x.get_resistance_points();
         j["saturationCurrentPeak"] = x.get_saturation_current_peak();
         j["selfResonantFrequency"] = x.get_self_resonant_frequency();
-        j["turnsRatio"] = x.get_turns_ratio();
+        j["turnsRatios"] = x.get_turns_ratios();
     }
 
     inline void from_json(const json & j, Mechanical& x) {
+        x.set_assembly_type(get_stack_optional<std::string>(j, "assemblyType"));
         x.set_diameter(get_stack_optional<DimensionWithTolerance>(j, "diameter"));
         x.set_height(get_stack_optional<DimensionWithTolerance>(j, "height"));
         x.set_length(get_stack_optional<DimensionWithTolerance>(j, "length"));
         x.set_mounting(get_stack_optional<ConnectionType>(j, "mounting"));
+        x.set_pin_length(get_stack_optional<DimensionWithTolerance>(j, "pinLength"));
+        x.set_weight(get_stack_optional<DimensionWithTolerance>(j, "weight"));
         x.set_width(get_stack_optional<DimensionWithTolerance>(j, "width"));
     }
 
     inline void to_json(json & j, const Mechanical & x) {
         j = json::object();
+        j["assemblyType"] = x.get_assembly_type();
         j["diameter"] = x.get_diameter();
         j["height"] = x.get_height();
         j["length"] = x.get_length();
         j["mounting"] = x.get_mounting();
+        j["pinLength"] = x.get_pin_length();
+        j["weight"] = x.get_weight();
         j["width"] = x.get_width();
+    }
+
+    inline void from_json(const json & j, Model& x) {
+        x.set_cp(j.at("cp").get<double>());
+        x.set_lp(j.at("lp").get<double>());
+        x.set_rp(j.at("rp").get<double>());
+        x.set_rs(get_stack_optional<double>(j, "rs"));
+    }
+
+    inline void to_json(json & j, const Model & x) {
+        j = json::object();
+        j["cp"] = x.get_cp();
+        j["lp"] = x.get_lp();
+        j["rp"] = x.get_rp();
+        j["rs"] = x.get_rs();
     }
 
     inline void from_json(const json & j, Part& x) {
@@ -13765,6 +14153,7 @@ namespace MAS {
         x.set_business(get_stack_optional<Business>(j, "business"));
         x.set_electrical(get_stack_optional<Electrical>(j, "electrical"));
         x.set_mechanical(get_stack_optional<Mechanical>(j, "mechanical"));
+        x.set_model(get_stack_optional<Model>(j, "model"));
         x.set_part(get_stack_optional<Part>(j, "part"));
         x.set_thermal(get_stack_optional<Thermal>(j, "thermal"));
     }
@@ -13775,6 +14164,7 @@ namespace MAS {
         j["business"] = x.get_business();
         j["electrical"] = x.get_electrical();
         j["mechanical"] = x.get_mechanical();
+        j["model"] = x.get_model();
         j["part"] = x.get_part();
         j["thermal"] = x.get_thermal();
     }
@@ -13807,8 +14197,8 @@ namespace MAS {
     }
 
     inline void from_json(const json & j, Magnetic& x) {
-        x.set_coil(j.at("coil").get<Coil>());
-        x.set_core(j.at("core").get<MagneticCore>());
+        x.set_coil(get_stack_optional<Coil>(j, "coil"));
+        x.set_core(get_stack_optional<MagneticCore>(j, "core"));
         x.set_distributors_info(get_stack_optional<std::vector<DistributorInfo>>(j, "distributorsInfo"));
         x.set_manufacturer_info(get_stack_optional<MagneticManufacturerInfo>(j, "manufacturerInfo"));
         x.set_rotation(get_stack_optional<std::vector<double>>(j, "rotation"));

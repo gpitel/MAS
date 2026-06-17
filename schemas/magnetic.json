@@ -57,11 +57,8 @@
                     "$ref": "#/$defs/magneticDatasheetPart"
                 },
                 "electrical": {
-                    "description": "Electrical characteristics as stated in the datasheet.",
-                    "oneOf": [
-                        {"$ref": "#/$defs/magneticDatasheetElectrical"},
-                        {"$ref": "#/$defs/magneticDatasheetElectricalChipBead"}
-                    ]
+                    "description": "Electrical characteristics as stated in the datasheet. Covers transformers, coupled inductors, common-mode chokes and chip beads; populate only the fields the datasheet provides.",
+                    "$ref": "#/$defs/magneticDatasheetElectrical"
                 },
                 "thermal": {
                     "description": "Operating temperature range from the datasheet.",
@@ -181,7 +178,7 @@
                     "$ref": "./utils.json#/$defs/dimensionWithTolerance"
                 },
                 "impedancePoints": {
-                    "description": "Impedance vs. frequency points from the datasheet. Uses the same impedanceAtFrequency structure as designRequirements.minimumImpedance.",
+                    "description": "Impedance vs. frequency points from the datasheet, optionally parameterised by DC bias current. The magnitude goes in impedance.magnitude; phase / real / imaginary parts are optional. Uses the same impedancePoint structure as designRequirements.minimumImpedance.",
                     "type": "array",
                     "items": {
                         "type": "object",
@@ -193,6 +190,11 @@
                             },
                             "frequency": {
                                 "description": "Frequency in Hz.",
+                                "type": "number",
+                                "minimum": 0
+                            },
+                            "current": {
+                                "description": "DC bias current in Amperes at which this point was measured (chip beads / DC-biased parts).",
                                 "type": "number",
                                 "minimum": 0
                             }
@@ -220,9 +222,13 @@
                     "description": "Self-resonant frequency in Hz.",
                     "type": "number"
                 },
-                "turnsRatio": {
-                    "description": "Turns ratio (e.g. 100 means 1:100) for coupled inductors / transformers.",
-                    "type": "number"
+                "turnsRatios": {
+                    "description": "Turns ratios between the primary and each other winding (primary turns / winding turns), one entry per secondary. An array so multi-secondary transformers / coupled inductors are representable, with tolerance per ratio. Uses the same array-of-dimensionWithTolerance shape as designRequirements.turnsRatios.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "./utils.json#/$defs/dimensionWithTolerance"
+                    },
+                    "minItems": 0
                 },
                 "couplingCoefficient": {
                     "description": "Magnetic coupling coefficient k (0\u20131).",
@@ -244,106 +250,6 @@
                         "required": [
                             "winding",
                             "resistance"
-                        ],
-                        "additionalProperties": false
-                    }
-                }
-            },
-            "additionalProperties": false
-        },
-        "magneticDatasheetApplication": {
-            "title": "MagneticDatasheetApplication",
-            "description": "Application parameters published by the manufacturer in the datasheet. These describe the circuit the component was designed for, not the component's intrinsic electrical properties.",
-            "type": "object",
-            "properties": {
-                "switchingFrequency": {
-                    "description": "Nominal switching frequency in Hz for which this component is designed.",
-                    "type": "number",
-                    "minimum": 0
-                },
-                "inputVoltage": {
-                    "description": "Input voltage range for which this component is designed, in Volts.",
-                    "$ref": "./utils.json#/$defs/dimension"
-                },
-                "outputVoltages": {
-                    "description": "Output voltages per secondary winding in Volts.",
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
-                },
-                "outputCurrents": {
-                    "description": "Output currents per secondary winding in Amperes.",
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    }
-                },
-                "auxiliaryVoltage": {
-                    "description": "Auxiliary winding voltage in Volts.",
-                    "type": "number"
-                }
-            },
-            "additionalProperties": false
-        },
-        "magneticDatasheetCommonModeFilter": {
-            "description": "Common-mode filter performance figures.",
-            "type": "object",
-            "properties": {
-                "cutOffFrequency": {
-                    "description": "-3 dB cut-off frequency of the common-mode filter in Hz.",
-                    "type": "number",
-                    "minimum": 0
-                },
-                "attenuation": {
-                    "description": "Common-mode insertion-loss / attenuation value from the datasheet in dB.",
-                    "type": "number"
-                },
-                "attenuationTestCondition": {
-                    "description": "Test condition string for the attenuation figure (e.g. '100 MHz, 50 \u03a9').",
-                    "type": "string"
-                }
-            },
-            "additionalProperties": false
-        },
-        "magneticDatasheetElectricalChipBead": {
-            "description": "Electrical characteristics associated with a chip bead as stated in the datasheet.",
-            "type": "object",
-            "properties": {
-                "dcResistance": {
-                    "description": "DC resistance per winding in Ohms. nominal = typical value, maximum = datasheet max.",
-                    "$ref": "./utils.json#/$defs/dimensionWithTolerance"
-                },
-                "ratedCurrent": {
-                    "description": "Rated DC current per winding in Amperes.",
-                    "type": "number"
-                },
-                "impedancePoints": {
-                    "description": "Impedance vs. frequency points from the datasheet, optionally parameterised by DC bias current.",
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "title": "DatasheetImpedancePoint",
-                        "properties": {
-                            "impedance": {
-                                "description": "Impedance value.",
-                                "type": "number",
-                                "minimum": 0
-                            },
-                            "frequency": {
-                                "description": "Frequency in Hz.",
-                                "type": "number",
-                                "minimum": 0
-                            },
-                            "current": {
-                                "description": "DC bias current in Amperes at which this point was measured.",
-                                "type": "number",
-                                "minimum": 0
-                            }
-                        },
-                        "required": [
-                            "impedance",
-                            "frequency"
                         ],
                         "additionalProperties": false
                     }
@@ -463,10 +369,61 @@
                     "type": "number",
                     "minimum": 0,
                     "maximum": 100
+                }
+            },
+            "additionalProperties": false
+        },
+        "magneticDatasheetApplication": {
+            "title": "MagneticDatasheetApplication",
+            "description": "Application parameters published by the manufacturer in the datasheet. These describe the circuit the component was designed for, not the component's intrinsic electrical properties.",
+            "type": "object",
+            "properties": {
+                "switchingFrequency": {
+                    "description": "Nominal switching frequency in Hz for which this component is designed.",
+                    "type": "number",
+                    "minimum": 0
                 },
-                "selfResonantFrequency": {
-                    "description": "Self-resonant frequency in Hz.",
+                "inputVoltage": {
+                    "description": "Input voltage range for which this component is designed, in Volts.",
+                    "$ref": "./utils.json#/$defs/dimension"
+                },
+                "outputVoltages": {
+                    "description": "Output voltages per secondary winding in Volts.",
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "outputCurrents": {
+                    "description": "Output currents per secondary winding in Amperes.",
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    }
+                },
+                "auxiliaryVoltage": {
+                    "description": "Auxiliary winding voltage in Volts.",
                     "type": "number"
+                }
+            },
+            "additionalProperties": false
+        },
+        "magneticDatasheetCommonModeFilter": {
+            "description": "Common-mode filter performance figures.",
+            "type": "object",
+            "properties": {
+                "cutOffFrequency": {
+                    "description": "-3 dB cut-off frequency of the common-mode filter in Hz.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "attenuation": {
+                    "description": "Common-mode insertion-loss / attenuation value from the datasheet in dB.",
+                    "type": "number"
+                },
+                "attenuationTestCondition": {
+                    "description": "Test condition string for the attenuation figure (e.g. '100 MHz, 50 \u03a9').",
+                    "type": "string"
                 }
             },
             "additionalProperties": false
