@@ -196,7 +196,8 @@
                 "parallel",
                 "length",
                 "coordinates"
-            ]
+            ],
+            "additionalProperties": false
         },
         "layer": {
             "description": "Data describing one layer in a magnetic",
@@ -307,7 +308,8 @@
                 "partialWindings",
                 "dimensions",
                 "coordinates"
-            ]
+            ],
+            "additionalProperties": false
         },
         "group": {
             "description": "Data describing one group in a magnetic, which can include several sections. Ideally this is used for PCB or different winding windows",
@@ -364,7 +366,8 @@
                 "partialWindings",
                 "dimensions",
                 "coordinates"
-            ]
+            ],
+            "additionalProperties": false
         },
         "section": {
             "description": "Data describing one section in a magnetic",
@@ -486,7 +489,8 @@
                 "partialWindings",
                 "dimensions",
                 "coordinates"
-            ]
+            ],
+            "additionalProperties": false
         },
         "marginInfo": {
             "description": "Data describing the information about the margin of a section",
@@ -625,7 +629,8 @@
                 "numberParallels",
                 "isolationSide",
                 "wire"
-            ]
+            ],
+            "additionalProperties": false
         },
         "connection": {
             "description": "Connection of a wire to a terminal.",

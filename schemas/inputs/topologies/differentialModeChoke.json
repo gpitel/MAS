@@ -113,7 +113,8 @@
             "required": [
                 "frequency",
                 "attenuation"
-            ]
+            ],
+            "additionalProperties": false
         }
     }
 }

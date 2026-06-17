@@ -8,7 +8,7 @@
     "properties": {
         "waveformLabel": {
             "description": "Waveform of the signal to measure",
-            "$ref": "../operatingPointExcitation.json#/$defs/waveformLabel"
+            "$ref": "https://psma.com/peas/inputs/operatingPointExcitation.json#/$defs/waveformLabel"
         },
         "maximumPrimaryCurrentPeak": {
             "description": "The maximum current peak in the input",
@@ -43,5 +43,6 @@
         "burdenResistor",
         "diodeVoltageDrop",
         "ambientTemperature"
-    ]
+    ],
+    "additionalProperties": false
 }

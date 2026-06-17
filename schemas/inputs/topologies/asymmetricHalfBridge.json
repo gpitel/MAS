@@ -98,9 +98,11 @@
                     },
                     "required": [
                         "dutyCycle"
-                    ]
+                    ],
+                    "additionalProperties": false
                 }
             ]
         }
-    }
+    },
+    "additionalProperties": false
 }

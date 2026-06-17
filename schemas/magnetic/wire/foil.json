@@ -27,5 +27,6 @@
     "required": [
         "conductingWidth"
     ],
-    "$defs": {}
+    "$defs": {},
+    "unevaluatedProperties": false
 }

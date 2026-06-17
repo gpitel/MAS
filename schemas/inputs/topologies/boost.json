@@ -47,5 +47,6 @@
             "title": "boostOperatingPoint",
             "$ref": "../../utils.json#/$defs/baseOperatingPoint"
         }
-    }
+    },
+    "additionalProperties": false
 }

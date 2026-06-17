@@ -22,7 +22,7 @@
             }
         },
         "manufacturerInfo": {
-            "$ref": "../../utils.json#/$defs/manufacturerInfo"
+            "$ref": "https://psma.com/peas/utils.json#/$defs/manufacturerInfo"
         },
         "dielectricStrength": {
             "type": "array",
@@ -127,7 +127,9 @@
             },
             "required": [
                 "value"
-            ]
+            ],
+            "additionalProperties": false
         }
-    }
+    },
+    "additionalProperties": false
 }

@@ -114,9 +114,11 @@
                     },
                     "required": [
                         "powerFlow"
-                    ]
+                    ],
+                    "additionalProperties": false
                 }
             ]
         }
-    }
+    },
+    "additionalProperties": false
 }

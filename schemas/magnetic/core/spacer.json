@@ -40,5 +40,6 @@
         "insulationMaterial",
         "dimensions",
         "coordinates"
-    ]
+    ],
+    "additionalProperties": false
 }

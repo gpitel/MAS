@@ -18,7 +18,7 @@
             ]
         },
         "masConformance": {
-            "description": "Optional declaration of which MAS conformance class this document targets. Class A \u2014 Inductor Basic. Class B \u2014 Transformer (multi-winding, insulation, isolated topologies). Class C \u2014 Full (all schemas, all topologies). See docs/conformance.md and schemas/conformance/.",
+            "description": "Optional declaration of which MAS conformance class this document targets. Class A — Inductor Basic. Class B — Transformer (multi-winding, insulation, isolated topologies). Class C — Full (all schemas, all topologies). See docs/conformance.md and schemas/conformance/.",
             "title": "MAS Conformance",
             "type": "string",
             "enum": [
@@ -50,5 +50,6 @@
         "inputs",
         "magnetic",
         "outputs"
-    ]
+    ],
+    "additionalProperties": false
 }

@@ -11,13 +11,13 @@
             "type": "string"
         },
         "manufacturerInfo": {
-            "$ref": "../utils.json#/$defs/manufacturerInfo"
+            "$ref": "https://psma.com/peas/utils.json#/$defs/manufacturerInfo"
         },
         "distributorsInfo": {
             "description": "The lists of distributors of the magnetic core",
             "type": "array",
             "items": {
-                "$ref": "../utils.json#/$defs/distributorInfo"
+                "$ref": "https://psma.com/peas/utils.json#/$defs/distributorInfo"
             },
             "uniqueItems": false
         },
@@ -93,7 +93,8 @@
                 "material",
                 "shape",
                 "gapping"
-            ]
+            ],
+            "additionalProperties": false
         },
         "processedDescription": {
             "description": "The data from the core after been processed, and ready to use by the analytical models",
@@ -164,7 +165,8 @@
                 "depth",
                 "windingWindows",
                 "columns"
-            ]
+            ],
+            "additionalProperties": false
         },
         "geometricalDescription": {
             "description": "List with data from the core based on its geometrical description, in a way that can be used by CAD models.",
@@ -222,7 +224,8 @@
                 "effectiveArea",
                 "minimumArea",
                 "effectiveVolume"
-            ]
+            ],
+            "additionalProperties": false
         },
         "rectangularWindingWindow": {
             "description": "It is the area between the winding column and the closest lateral column, and it represents the area where all the wires of the magnetic will have to fit, and equivalently, where all the current must circulate once, in the case of inductors, or twice, in the case of transformers",
@@ -286,7 +289,8 @@
             "required": [
                 "width",
                 "height"
-            ]
+            ],
+            "additionalProperties": false
         },
         "radialWindingWindow": {
             "description": "It is the area between the delimited between a height from the surface of the toroidal core at a given angle, and it represents the area where all the wires of the magnetic will have to fit, and equivalently, where all the current must circulate once, in the case of inductors, or twice, in the case of transformers",
@@ -339,7 +343,8 @@
             "required": [
                 "angle",
                 "radialHeight"
-            ]
+            ],
+            "additionalProperties": false
         },
         "columnData": {
             "description": "Data describing a column of the core",
@@ -400,7 +405,9 @@
                 "height",
                 "area",
                 "coordinates"
-            ]
+            ],
+            "additionalProperties": false
         }
-    }
+    },
+    "additionalProperties": false
 }

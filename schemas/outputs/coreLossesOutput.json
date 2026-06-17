@@ -16,7 +16,7 @@
         "magneticFluxDensity": {
             "description": "Excitation of the B field that produced the core losses",
             "title": "excitation",
-            "$ref": "../inputs/operatingPointExcitation.json#/$defs/signalDescriptor"
+            "$ref": "https://psma.com/peas/inputs/operatingPointExcitation.json#/$defs/signalDescriptor"
         },
         "temperature": {
             "description": "temperature in the core that produced the core losses",
@@ -54,5 +54,6 @@
         "coreLosses",
         "temperature"
     ],
-    "$defs": {}
+    "$defs": {},
+    "additionalProperties": false
 }

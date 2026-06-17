@@ -32,13 +32,21 @@
         "controlMode": {
             "description": "Controller duty-assignment strategy in the buck-boost region (peakCurrent: TI LM5176, peakBuckPeakBoost: ADI LT8390, averageCurrent: USB-PD, voltageMode: legacy)",
             "type": "string",
-            "enum": ["peakCurrent", "peakBuckPeakBoost", "averageCurrent", "voltageMode"],
+            "enum": [
+                "peakCurrent",
+                "peakBuckPeakBoost",
+                "averageCurrent",
+                "voltageMode"
+            ],
             "default": "peakCurrent"
         },
         "transitionMode": {
             "description": "Buck-boost-region modulation: 'simultaneous' (Mode 1, Q1+Q3 ON together) or 'splitPwm' (Mode 2, sequential split-PWM, LM5176/LT8390 default)",
             "type": "string",
-            "enum": ["simultaneous", "splitPwm"],
+            "enum": [
+                "simultaneous",
+                "splitPwm"
+            ],
             "default": "splitPwm"
         },
         "bidirectional": {
@@ -80,5 +88,6 @@
                 }
             ]
         }
-    }
+    },
+    "additionalProperties": false
 }

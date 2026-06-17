@@ -28,10 +28,10 @@
             "type": "string"
         },
         "manufacturerInfo": {
-            "$ref": "../../utils.json#/$defs/manufacturerInfo"
+            "$ref": "https://psma.com/peas/utils.json#/$defs/manufacturerInfo"
         },
         "conductingArea": {
-            "description": "The conducting area of the wire, in m\u00b2. Used for some rectangular shapes where the area is smaller than expected due to rounded corners",
+            "description": "The conducting area of the wire, in m². Used for some rectangular shapes where the area is smaller than expected due to rounded corners",
             "$ref": "../../utils.json#/$defs/dimensionWithTolerance"
         },
         "numberConductors": {

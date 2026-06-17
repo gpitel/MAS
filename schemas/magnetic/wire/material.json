@@ -54,7 +54,8 @@
                 "referenceValue",
                 "referenceTemperature",
                 "temperatureCoefficient"
-            ]
+            ],
+            "additionalProperties": false
         },
         "thermalConductivityPoint": {
             "description": "data for describing one point of thermal conductivity",
@@ -73,7 +74,9 @@
             "required": [
                 "value",
                 "temperature"
-            ]
+            ],
+            "additionalProperties": false
         }
-    }
+    },
+    "additionalProperties": false
 }
