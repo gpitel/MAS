@@ -74,15 +74,6 @@
         "operatingPoints"
     ],
     "$defs": {
-        "cukPowerFlow": {
-            "description": "Power-flow direction for one operating point of a bidirectional Cuk (ignored when bidirectional=false).",
-            "title": "cukPowerFlow",
-            "type": "string",
-            "enum": [
-                "forward",
-                "reverse"
-            ]
-        },
         "cukOperatingPoint": {
             "description": "The description of one Cuk operating point. NOTE: outputVoltages magnitudes are passed positive here; Vo is signed negative internally per Cuk polarity convention. powerFlow is required only when the parent Cuk has bidirectional=true.",
             "title": "cukOperatingPoint",
@@ -94,7 +85,7 @@
             "properties": {
                 "powerFlow": {
                     "description": "Power-flow direction. Forward = source -> load via L1; reverse = load -> source via L2.",
-                    "$ref": "#/$defs/cukPowerFlow"
+                    "$ref": "../../utils.json#/$defs/powerFlowDirection"
                 }
             },
             "unevaluatedProperties": false

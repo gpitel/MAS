@@ -79,15 +79,6 @@
         "operatingPoints"
     ],
     "$defs": {
-        "cllcPowerFlow": {
-            "description": "The power flow direction",
-            "title": "cllcPowerFlow",
-            "type": "string",
-            "enum": [
-                "forward",
-                "reverse"
-            ]
-        },
         "cllcBridgeType": {
             "description": "CLLC primary bridge topology selector",
             "title": "cllcBridgeType",
@@ -108,7 +99,7 @@
             "properties": {
                 "powerFlow": {
                     "description": "The power flow direction.",
-                    "$ref": "#/$defs/cllcPowerFlow"
+                    "$ref": "../../utils.json#/$defs/powerFlowDirection"
                 }
             },
             "required": [

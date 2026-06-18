@@ -518,6 +518,15 @@
             ],
             "additionalProperties": false
         },
+        "powerFlowDirection": {
+            "description": "Bidirectional power-flow direction. Used by all topologies that share forward/reverse semantics (CLLC, CLLLC, Cuk). Single canonical definition; topology schemas reference this via $ref.",
+            "title": "powerFlowDirection",
+            "type": "string",
+            "enum": [
+                "forward",
+                "reverse"
+            ]
+        },
         "isolationSide": {
             "description": "Tag to identify windings that are sharing the same ground",
             "title": "isolationSide",

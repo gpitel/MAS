@@ -110,15 +110,6 @@
                 "fixedFrequencyPhaseShift"
             ]
         },
-        "clllcPowerFlowDirection": {
-            "description": "The power flow direction for one CLLLC operating point",
-            "title": "clllcPowerFlowDirection",
-            "type": "string",
-            "enum": [
-                "forward",
-                "reverse"
-            ]
-        },
         "clllcOperatingPoint": {
             "description": "The description of one CLLLC operating point",
             "title": "clllcOperatingPoint",
@@ -130,7 +121,7 @@
             "properties": {
                 "powerFlowDirection": {
                     "description": "The power flow direction.",
-                    "$ref": "#/$defs/clllcPowerFlowDirection",
+                    "$ref": "../../utils.json#/$defs/powerFlowDirection",
                     "default": "forward"
                 },
                 "phaseShiftDegrees": {
