@@ -103,21 +103,18 @@
             "allOf": [
                 {
                     "$ref": "../../utils.json#/$defs/baseOperatingPoint"
-                },
-                {
-                    "type": "object",
-                    "properties": {
-                        "powerFlow": {
-                            "description": "The power flow direction.",
-                            "$ref": "#/$defs/cllcPowerFlow"
-                        }
-                    },
-                    "required": [
-                        "powerFlow"
-                    ],
-                    "additionalProperties": false
                 }
-            ]
+            ],
+            "properties": {
+                "powerFlow": {
+                    "description": "The power flow direction.",
+                    "$ref": "#/$defs/cllcPowerFlow"
+                }
+            },
+            "required": [
+                "powerFlow"
+            ],
+            "unevaluatedProperties": false
         }
     },
     "additionalProperties": false

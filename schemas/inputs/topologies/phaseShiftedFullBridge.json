@@ -69,21 +69,18 @@
             "allOf": [
                 {
                     "$ref": "../../utils.json#/$defs/baseOperatingPoint"
-                },
-                {
-                    "type": "object",
-                    "properties": {
-                        "phaseShift": {
-                            "description": "Phase shift in degrees",
-                            "type": "number"
-                        }
-                    },
-                    "required": [
-                        "phaseShift"
-                    ],
-                    "additionalProperties": false
                 }
-            ]
+            ],
+            "properties": {
+                "phaseShift": {
+                    "description": "Phase shift in degrees",
+                    "type": "number"
+                }
+            },
+            "required": [
+                "phaseShift"
+            ],
+            "unevaluatedProperties": false
         }
     },
     "additionalProperties": false

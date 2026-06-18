@@ -125,23 +125,20 @@
             "allOf": [
                 {
                     "$ref": "../../utils.json#/$defs/baseOperatingPoint"
-                },
-                {
-                    "type": "object",
-                    "properties": {
-                        "powerFlowDirection": {
-                            "description": "The power flow direction.",
-                            "$ref": "#/$defs/clllcPowerFlowDirection",
-                            "default": "forward"
-                        },
-                        "phaseShiftDegrees": {
-                            "description": "Inter-bridge phase shift; only used by psm or hybridPfmPsm",
-                            "type": "number"
-                        }
-                    },
-                    "additionalProperties": false
                 }
-            ]
+            ],
+            "properties": {
+                "powerFlowDirection": {
+                    "description": "The power flow direction.",
+                    "$ref": "#/$defs/clllcPowerFlowDirection",
+                    "default": "forward"
+                },
+                "phaseShiftDegrees": {
+                    "description": "Inter-bridge phase shift; only used by psm or hybridPfmPsm",
+                    "type": "number"
+                }
+            },
+            "unevaluatedProperties": false
         }
     },
     "additionalProperties": false

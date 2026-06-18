@@ -65,8 +65,7 @@
                 "outputCurrents",
                 "switchingFrequency",
                 "ambientTemperature"
-            ],
-            "additionalProperties": false
+            ]
         },
         "insulationType": {
             "$ref": "https://psma.com/peas/utils.json#/$defs/isolationClass"

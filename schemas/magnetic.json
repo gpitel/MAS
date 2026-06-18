@@ -20,17 +20,14 @@
             "allOf": [
                 {
                     "$ref": "https://psma.com/peas/utils.json#/$defs/manufacturerInfo"
-                },
-                {
-                    "type": "object",
-                    "properties": {
-                        "datasheetInfo": {
-                            "description": "All values extracted directly from the component datasheet, organised by domain.",
-                            "$ref": "#/$defs/magneticDatasheetInfo"
-                        }
-                    }
                 }
             ],
+            "properties": {
+                "datasheetInfo": {
+                    "description": "All values extracted directly from the component datasheet, organised by domain.",
+                    "$ref": "#/$defs/magneticDatasheetInfo"
+                }
+            },
             "unevaluatedProperties": false
         },
         "distributorsInfo": {

@@ -89,18 +89,15 @@
             "allOf": [
                 {
                     "$ref": "../../utils.json#/$defs/baseOperatingPoint"
-                },
-                {
-                    "type": "object",
-                    "properties": {
-                        "powerFlow": {
-                            "description": "Power-flow direction. Forward = source -> load via L1; reverse = load -> source via L2.",
-                            "$ref": "#/$defs/cukPowerFlow"
-                        }
-                    },
-                    "additionalProperties": false
                 }
-            ]
+            ],
+            "properties": {
+                "powerFlow": {
+                    "description": "Power-flow direction. Forward = source -> load via L1; reverse = load -> source via L2.",
+                    "$ref": "#/$defs/cukPowerFlow"
+                }
+            },
+            "unevaluatedProperties": false
         }
     },
     "additionalProperties": false
