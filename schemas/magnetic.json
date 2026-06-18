@@ -28,10 +28,10 @@
                             "description": "All values extracted directly from the component datasheet, organised by domain.",
                             "$ref": "#/$defs/magneticDatasheetInfo"
                         }
-                    },
-                    "additionalProperties": false
+                    }
                 }
-            ]
+            ],
+            "unevaluatedProperties": false
         },
         "distributorsInfo": {
             "description": "The lists of distributors of the magnetic",
