@@ -1,0 +1,46 @@
+{
+  "functionalDescription": [
+    {
+      "name": "P",
+      "isolationSide": "primary",
+      "connections": [
+        {
+          "type": "Pin",
+          "pinName": "1"
+        },
+        {
+          "type": "Pin",
+          "pinName": "2"
+        }
+      ]
+    },
+    {
+      "name": "S1",
+      "isolationSide": "secondary",
+      "connections": [
+        {
+          "type": "Pin",
+          "pinName": "3"
+        },
+        {
+          "type": "Pin",
+          "pinName": "4"
+        }
+      ]
+    },
+    {
+      "name": "S2",
+      "isolationSide": "tertiary",
+      "connections": [
+        {
+          "type": "Pin",
+          "pinName": "5"
+        },
+        {
+          "type": "Pin",
+          "pinName": "6"
+        }
+      ]
+    }
+  ]
+}

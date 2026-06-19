@@ -1,0 +1,60 @@
+{
+  "functionalDescription": [
+    {
+      "name": "P1",
+      "isolationSide": "primary",
+      "connections": [
+        {
+          "type": "Pin",
+          "pinName": "1"
+        },
+        {
+          "type": "Blind",
+          "pinName": "B1"
+        }
+      ]
+    },
+    {
+      "name": "P2",
+      "isolationSide": "primary",
+      "connections": [
+        {
+          "type": "Blind",
+          "pinName": "B1"
+        },
+        {
+          "type": "Blind",
+          "pinName": "B2"
+        }
+      ]
+    },
+    {
+      "name": "P3",
+      "isolationSide": "primary",
+      "connections": [
+        {
+          "type": "Blind",
+          "pinName": "B2"
+        },
+        {
+          "type": "Pin",
+          "pinName": "2"
+        }
+      ]
+    },
+    {
+      "name": "S",
+      "isolationSide": "secondary",
+      "connections": [
+        {
+          "type": "Pin",
+          "pinName": "3"
+        },
+        {
+          "type": "Pin",
+          "pinName": "4"
+        }
+      ]
+    }
+  ]
+}
