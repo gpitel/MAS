@@ -573,6 +573,10 @@
                     "type": "number",
                     "minimum": 0
                 },
+                "inductance": {
+                    "description": "Rated common-mode inductance in Henries (the per-line inductance presented to common-mode current). Datasheet-specified for common-mode chokes; distinct from leakageInductance (the differential-mode term).",
+                    "$ref": "./utils.json#/$defs/dimensionWithTolerance"
+                },
                 "leakageInductance": {
                     "description": "Differential-mode (leakage) inductance in Henries.",
                     "$ref": "./utils.json#/$defs/dimensionWithTolerance"
