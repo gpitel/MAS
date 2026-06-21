@@ -187,6 +187,30 @@
             ],
             "additionalProperties": false
         },
+        "magneticDatasheetInductancePoint": {
+            "title": "DatasheetInductancePoint",
+            "description": "One inductance measurement at a DC-bias current (and optional temperature) — a point on the inductance roll-off / saturation curve.",
+            "type": "object",
+            "properties": {
+                "inductance": {
+                    "description": "Inductance in Henries.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "current": {
+                    "description": "DC bias current in Amperes at which this point was measured.",
+                    "type": "number"
+                },
+                "temperature": {
+                    "description": "Measurement temperature in degrees Celsius.",
+                    "type": "number"
+                }
+            },
+            "required": [
+                "inductance"
+            ],
+            "additionalProperties": false
+        },
         "magneticDatasheetResistancePoint": {
             "title": "DatasheetResistancePoint",
             "description": "Resistance vs. frequency point from the datasheet, optionally parameterised by DC bias current.",
@@ -350,6 +374,13 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/$defs/magneticDatasheetImpedancePoint"
+                    }
+                },
+                "inductancePoints": {
+                    "description": "Inductance vs. DC-bias current points (inductance roll-off / saturation curve), optionally per temperature.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/magneticDatasheetInductancePoint"
                     }
                 },
                 "maximumImpedance": {
