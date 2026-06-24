@@ -1,0 +1,32 @@
+{
+  "functionalDescription": [
+    {
+      "name": "P",
+      "isolationSide": "primary",
+      "connections": [
+        {
+          "type": "Pin",
+          "pinName": "1"
+        },
+        {
+          "type": "Pin",
+          "pinName": "2"
+        }
+      ]
+    },
+    {
+      "name": "S",
+      "isolationSide": "secondary",
+      "connections": [
+        {
+          "type": "Pin",
+          "pinName": "3"
+        },
+        {
+          "type": "Pin",
+          "pinName": "4"
+        }
+      ]
+    }
+  ]
+}

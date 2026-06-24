@@ -1,0 +1,102 @@
+{
+  "functionalDescription": [
+    {
+      "name": "P1",
+      "isolationSide": "primary",
+      "connections": [
+        {
+          "type": "Pin",
+          "pinName": "1"
+        },
+        {
+          "type": "Blind",
+          "pinName": "B1"
+        }
+      ]
+    },
+    {
+      "name": "P2",
+      "isolationSide": "primary",
+      "connections": [
+        {
+          "type": "Pin",
+          "pinName": "2"
+        },
+        {
+          "type": "Blind",
+          "pinName": "B1"
+        }
+      ]
+    },
+    {
+      "name": "P3",
+      "isolationSide": "primary",
+      "connections": [
+        {
+          "type": "Pin",
+          "pinName": "3"
+        },
+        {
+          "type": "Blind",
+          "pinName": "B1"
+        }
+      ]
+    },
+    {
+      "name": "S",
+      "isolationSide": "secondary",
+      "connections": [
+        {
+          "type": "Pin",
+          "pinName": "S1"
+        },
+        {
+          "type": "Pin",
+          "pinName": "S2"
+        }
+      ]
+    },
+    {
+      "name": "T1",
+      "isolationSide": "tertiary",
+      "connections": [
+        {
+          "type": "Pin",
+          "pinName": "4"
+        },
+        {
+          "type": "Blind",
+          "pinName": "B2"
+        }
+      ]
+    },
+    {
+      "name": "T2",
+      "isolationSide": "tertiary",
+      "connections": [
+        {
+          "type": "Pin",
+          "pinName": "5"
+        },
+        {
+          "type": "Blind",
+          "pinName": "B2"
+        }
+      ]
+    },
+    {
+      "name": "T3",
+      "isolationSide": "tertiary",
+      "connections": [
+        {
+          "type": "Pin",
+          "pinName": "6"
+        },
+        {
+          "type": "Blind",
+          "pinName": "B2"
+        }
+      ]
+    }
+  ]
+}
