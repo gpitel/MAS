@@ -95,6 +95,10 @@
                             "$ref": "#/$defs/magneticDatasheetChipBeadModel"
                         }
                     ]
+                },
+                "provenance": {
+                    "description": "Data-provenance trail (see provenance).",
+                    "$ref": "./utils.json#/$defs/provenance"
                 }
             },
             "additionalProperties": false
