@@ -633,6 +633,7 @@
             "additionalProperties": false
         },
         "connection": {
+            "title": "connectionElement",
             "description": "Connection of a wire to a terminal.",
             "type": "object",
             "properties": {

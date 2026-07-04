@@ -118,6 +118,79 @@
                     },
                     "additionalProperties": false
                 },
+                "shielding": {
+                    "description": "List of electrostatic shields that must be placed between windings",
+                    "type": "array",
+                    "items": {
+                        "title": "shieldingRequirement",
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "description": "A label that identifies this shield",
+                                "type": "string"
+                            },
+                            "betweenWindings": {
+                                "description": "Names of the two windings between which the shield must be placed. The shield is inserted at every interface where sections of these two windings are adjacent, unless restricted by interfaces",
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                            },
+                            "interfaces": {
+                                "description": "Zero-based ordinals of the insulation interfaces of the wound coil (counted in winding order, wrap-around interface last) at which the shield must be placed. If absent, the shield is placed at every interface where the two windings are adjacent",
+                                "type": "array",
+                                "items": {
+                                    "type": "integer",
+                                    "minimum": 0
+                                },
+                                "minItems": 1,
+                                "uniqueItems": true
+                            },
+                            "material": {
+                                "description": "Material of the shield, by default copper",
+                                "type": "string",
+                                "default": "copper"
+                            },
+                            "thickness": {
+                                "description": "Thickness of the shield, in m",
+                                "type": "number",
+                                "exclusiveMinimum": 0
+                            },
+                            "coverage": {
+                                "description": "Proportion of the winding window breadth covered by the shield, from 0 to 1. Ignored when margin is present",
+                                "type": "number",
+                                "exclusiveMinimum": 0,
+                                "maximum": 1,
+                                "default": 1
+                            },
+                            "margin": {
+                                "description": "Distances at the extremes of the winding window kept clear by the shield, in m. Two-element array, from 'inner or top' to 'outer or bottom', like section margins. Takes precedence over coverage",
+                                "type": "array",
+                                "items": {
+                                    "type": "number",
+                                    "minimum": 0
+                                },
+                                "minItems": 2,
+                                "maxItems": 2
+                            },
+                            "connection": {
+                                "description": "How the shield termination is connected. A shield terminates at one point only — the other end is left unconnected to avoid a shorted turn — so unlike windings there is a single connection instead of a start-finish pair",
+                                "$ref": "../magnetic/coil.json#/$defs/connection"
+                            },
+                            "terminatedTo": {
+                                "description": "Name of the winding whose quiet node the shield single-ended termination is connected to",
+                                "type": "string"
+                            }
+                        },
+                        "required": [
+                            "betweenWindings"
+                        ],
+                        "additionalProperties": false
+                    },
+                    "minItems": 0
+                },
                 "wiringTechnology": {
                     "$ref": "../utils.json#/$defs/wiringTechnology"
                 }
