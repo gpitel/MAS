@@ -129,6 +129,20 @@
                                 "description": "A label that identifies this shield",
                                 "type": "string"
                             },
+                            "type": {
+                                "description": "Construction of the shield: a continuous foil (near-complete coverage, must stay much thinner than a skin depth to limit eddy loss), or a screen wound from wire like a winding layer (runs on standard winding equipment, lower eddy loss, partial coverage)",
+                                "title": "shieldingType",
+                                "type": "string",
+                                "enum": [
+                                    "foil",
+                                    "wound"
+                                ],
+                                "default": "foil"
+                            },
+                            "wire": {
+                                "description": "Name of the wire the screen is wound from, when the shield type is wound. The shield layer thickness follows the wire outer diameter",
+                                "type": "string"
+                            },
                             "betweenWindings": {
                                 "description": "Names of the two windings between which the shield must be placed. The shield is inserted at every interface where sections of these two windings are adjacent, unless restricted by interfaces",
                                 "type": "array",
