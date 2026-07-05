@@ -144,11 +144,10 @@
                                 "type": "string"
                             },
                             "betweenWindings": {
-                                "description": "Indexes of the two windings between which the shield must be placed (0-based, in functionalDescription order, like isolationSides). The shield is inserted at every interface where sections of these two windings are adjacent, unless restricted by interfaces",
+                                "description": "Names of the two windings between which the shield must be placed, as windings are referenced by name throughout MAS. The shield is inserted at every interface where sections of these two windings are adjacent, unless restricted by interfaces",
                                 "type": "array",
                                 "items": {
-                                    "type": "integer",
-                                    "minimum": 0
+                                    "type": "string"
                                 },
                                 "minItems": 2,
                                 "maxItems": 2
@@ -195,9 +194,8 @@
                                 "$ref": "../magnetic/coil.json#/$defs/connection"
                             },
                             "terminatedTo": {
-                                "description": "Index of the winding whose quiet node the shield single-ended termination is connected to (0-based, in functionalDescription order)",
-                                "type": "integer",
-                                "minimum": 0
+                                "description": "Name of the winding whose quiet node the shield single-ended termination is connected to",
+                                "type": "string"
                             }
                         },
                         "required": [
