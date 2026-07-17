@@ -1,6 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "http://openmagnetics.com/schemas/magnetic/core/piece.json",
+    "$id": "https://psma.com/mas/magnetic/core/piece.json",
+    "$comment": "SPDX-License-Identifier: Apache-2.0",
     "title": "core/piece",
     "description": "Data describing the a piece of a core",
     "type": "object",
@@ -8,12 +9,20 @@
         "type": {
             "description": "The type of piece",
             "type": "string",
-            "enum": ["half set", "toroidal", "plate", "sheet", "closed"]
+            "enum": [
+                "halfSet",
+                "toroidal",
+                "plate",
+                "sheet",
+                "closed"
+            ]
         },
         "material": {
             "title": "CoreMaterialDataOrNameUnion",
             "oneOf": [
-                {"$ref": "/schemas/magnetic/core/material.json"},
+                {
+                    "$ref": "./material.json"
+                },
                 {
                     "description": "The name of the material used in the piece",
                     "type": "string"
@@ -23,7 +32,9 @@
         "shape": {
             "title": "CoreShapeDataOrNameUnion",
             "oneOf": [
-                {"$ref": "/schemas/magnetic/core/shape.json"},
+                {
+                    "$ref": "./shape.json"
+                },
                 {
                     "description": "The name of the shape used in the piece",
                     "type": "string"
@@ -32,11 +43,11 @@
         },
         "coordinates": {
             "description": "The coordinates of the top of the piece, referred to the center of the main column",
-            "$ref": "/schemas/utils.json#/$defs/coordinates"
+            "$ref": "../../utils.json#/$defs/coordinates"
         },
         "rotation": {
             "description": "The rotation of the top of the piece from its original state, referred to the center of the main column",
-            "$ref": "/schemas/utils.json#/$defs/rotation"
+            "$ref": "../../utils.json#/$defs/rotation"
         },
         "machining": {
             "type": "array",
@@ -46,10 +57,15 @@
             "uniqueItems": true
         }
     },
-    "required": ["type", "material", "shape", "coordinates", "rotation"],
-
+    "required": [
+        "type",
+        "material",
+        "shape",
+        "coordinates",
+        "rotation"
+    ],
     "$defs": {
-        "machining":{
+        "machining": {
             "description": "Data describing the machining applied to a piece",
             "title": "machining",
             "type": "object",
@@ -61,10 +77,15 @@
                 },
                 "coordinates": {
                     "description": "The coordinates of the start of the machining, referred to the top of the main column of the piece",
-                    "$ref": "/schemas/utils.json#/$defs/coordinates"
+                    "$ref": "../../utils.json#/$defs/coordinates"
                 }
             },
-            "required": ["length", "coordinates"]
+            "required": [
+                "length",
+                "coordinates"
+            ],
+            "additionalProperties": false
         }
-    }
+    },
+    "additionalProperties": false
 }

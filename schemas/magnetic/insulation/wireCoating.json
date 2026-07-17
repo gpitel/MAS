@@ -1,6 +1,7 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "http://openmagnetics.com/schemas/magnetic/insulation/wireCoating.json",
+    "$id": "https://psma.com/mas/magnetic/insulation/wireCoating.json",
+    "$comment": "SPDX-License-Identifier: Apache-2.0",
     "title": "insulation/wireCoating",
     "description": "A coating for a wire",
     "type": "object",
@@ -8,15 +9,24 @@
         "type": {
             "description": "The type of the coating",
             "type": "string",
-            "enum": ["bare", "enamelled", "insulated", "served", "taped", "extruded"]
+            "enum": [
+                "bare",
+                "enamelled",
+                "insulated",
+                "served",
+                "taped",
+                "extruded"
+            ]
         },
         "thickness": {
             "description": "The maximum thickness of the insulation around the wire, in m",
-            "$ref": "/schemas/utils.json#/$defs/dimensionWithTolerance"
+            "$ref": "../../utils.json#/$defs/dimensionWithTolerance"
         },
         "material": {
             "oneOf": [
-                {"$ref": "/schemas/magnetic/insulation/material.json"},
+                {
+                    "$ref": "./material.json"
+                },
                 {
                     "description": "The name of the material used in the insulation",
                     "type": "string"
@@ -52,26 +62,48 @@
     "allOf": [
         {
             "if": {
-                "properties": { "type": { "const": "bare" } }
+                "properties": {
+                    "type": {
+                        "const": "bare"
+                    }
+                }
             },
             "then": {
-                "required": ["type"]
+                "required": [
+                    "type"
+                ]
             }
         },
         {
             "if": {
-                "properties": { "type": { "const": "insulated" } }
+                "properties": {
+                    "type": {
+                        "const": "insulated"
+                    }
+                }
             },
             "then": {
-                "required": ["type", "material", "numberLayers", "thicknessLayers"]
+                "required": [
+                    "type",
+                    "material",
+                    "numberLayers",
+                    "thicknessLayers"
+                ]
             }
         },
         {
             "if": {
-                "properties": { "type": { "const": "enamelled" } }
+                "properties": {
+                    "type": {
+                        "const": "enamelled"
+                    }
+                }
             },
             "then": {
-                "required": ["type", "grade"]
+                "required": [
+                    "type",
+                    "grade"
+                ]
             }
         }
     ]

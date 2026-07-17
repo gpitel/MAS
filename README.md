@@ -1,79 +1,143 @@
-# Magnetic Agnostic Structure (MAS)
+# MAS — Magnetic Agnostic Structure
 
-What I present here is the initial version of a common language that can **unambiguously describe a magnetic component**. The aim of this project is to provide a format that can be **written and understood by any human**, that can be **shared**, **copied**, **versioned**, and **stored** efficiently; that different software tools can read it and produce an equal result, be they Analytical tools, Circuit simulators, Finite Element or CAD software. A format can automatically produce a technical drawing, a 3D model, a temperature estimation, a magnetic field plot, or a list of assembly steps, without leaving a detail to interpretation.
+A vendor-neutral data model for describing magnetic components used in
+power electronics: their design requirements, physical construction, and
+computed performance. MAS is incubated at OpenMagnetics and is being
+prepared for transfer to the [PSMA](https://www.psma.com/) Magnetics
+Committee for further stewardship.
 
-This first prototype I called Magnetic Agnostic Structure, because it defines a magnetic independently of its kind or application, and because being an Engineer, I like puns, and its acronym is MAS, which means "more" or "plus" in my mother tongue, Spanish.
+## Status
 
-I would like to start with some clarifications, or "design decisions" , I took along the way, and explain why I took them. I also think they are a nice way of introducing the reasoning behind the MAS format.
+| Aspect | Value |
+|----|----|
+| Specification version | pre-1.0, see [`CHANGELOG.md`](CHANGELOG.md) |
+| Schema dialect | JSON Schema [draft 2020-12](https://json-schema.org/draft/2020-12/release-notes) |
+| Stewardship | OpenMagnetics maintainers (incubation phase) |
+| Roadmap | OpenMagnetics → proposed PSMA Magnetics Committee Working Group. See [`GOVERNANCE.md`](GOVERNANCE.md). |
+| License | Apache-2.0 (see [`LICENSE.md`](LICENSE.md)) |
+| Open work items | numbered RFCs under [`proposals/`](proposals/) |
 
-A magnetic component is just a piece of iron with copper wires around it without an application. The excitation defines the magnetic as much as the construction: the same component can be used as a transformer in a LLC or as an inductor in a Flyback. Some coupled inductors can be used as a common mode choke. Of course, the performance is not going to be the same, as normally one component is optimized for an application, but that is beside my point. What I want to highlight is that the operating point (excitation and conditions) is as important as the construction, and they must be equally defined.
+## Scope
 
-For that reason, I decided for my specification to cover both, but separate, and I called them inputs and magnetic. One input can excite many magnetics, and one magnetic can work with many different inputs.
+MAS describes magnetic components used in power-electronic converters:
+transformers, inductors, chokes, current transformers and the operating
+points and outputs associated with them. A MAS document has three
+top-level parts:
 
-Another design decision I took was to support indirection (also called dereferencing). This is a fancy term used mainly in programming, but the used is a logical one: when a property needs to be defined (let’s say the shape of the core) the property can be defined directly in the document (by including all the data about that shape: dimensions, family, etc.) or just a name (just say we are using shape ETD 49). Of course, in the second case, that reference needs to be defined somewhere accessible (in a manufacturer datasheet, in the standard, or in another database).It might be weird, but we will clarify it with further examples later. But why would I want to do that? Well, because it allows us to use components that already exist (RM 12, TDK N87, Litz 800x0.1) together with custom definitions (a custom shape, a custom wire, or a custom material). It even allows us to define and reuse our custom components.It allows us to create a scalable system.
+| Part | What it describes |
+|----|----|
+| `inputs`  | Design requirements and operating conditions — what the magnetic must do. |
+| `magnetic` | Physical construction — core, coil, materials, gaps, insulation, bobbin. |
+| `outputs`  | Computed results — core and winding losses, inductance, temperature rise, stray capacitance, insulation coordination. |
 
-The last decision I took was the format of the files. It needs to be a structured format that is readable and editable easily by a human, that can be processed by a generic software, that can be stored in a database, downloaded, or even printed; and ideally that could enforce certain templates, in order to maintain the format itself.
+In scope:
 
-I decided to go with JSON (JavaScript Object Notation, pronounced /ˈdʒeɪsən/; also /ˈdʒeɪˌsɒn/) because it supports lists (used for listing the different windings in a magnetic) and dictionaries (a key-value part, for example: "shape": "ETD49"), it has no strange keywords around, so it is really easy to read, it is supported by any programming language and software, it can be efficiently stored in most modern databases; and my favorite part, it has a declarative language (called JSON Schema: https://json-schema.org) that defines the structure of a given JSON, so it is possible to establish that a JSON defining a core must have a material and a shape, or otherwise it is wrong.
+- Cores: ferrite, powder, amorphous, nanocrystalline; ungapped and gapped.
+- Coils: single and multi-winding, round / rectangular / foil / planar / litz wires.
+- Insulation: temperature classes, dielectric strength, creepage, reinforced and double insulation per IEC 62368-1 / IEC 61558.
+- Sixteen converter topologies, from buck and boost through LLC, CLLC, dual-active-bridge, push-pull and PFC.
 
-So we already have some foundational steps: we are going to define inputs and magnetics, we can define custom parts, name them, and reuse them; and we can define rules to enforce our format. It sounds like a good start to me.
+Out of scope:
 
-## Inputs
-As explained in the [Inputs Section] (https://github.com/OpenMagnetics/MAS/blob/main/docs/inputs.md)
+- PCB layout and routing (covered by IPC formats).
+- Thermal-management hardware beyond the magnetic itself.
+- Rotating machines (motor / generator construction).
 
-## Magnetic
-As explained in the [Magnetic Section] (https://github.com/OpenMagnetics/MAS/blob/main/docs/magnetic.md)
+Conformance classes — A (Inductor Basic), B (Transformer), C (Full) —
+are proposed in [`proposals/0002-conformance-classes.md`](proposals/0002-conformance-classes.md).
 
-## Outputs
-As explained in the [Outputs Section] (TBD)
+## Normative references
 
+MAS defers to existing international standards wherever possible.
+[`docs/normative-references.md`](docs/normative-references.md) is the
+master mapping. Highlights:
 
-```mermaid
-classDiagram
+- **Core shapes:** IEC 62317 series, IEC 63093 series.
+- **Effective parameters Aₑ, lₑ, Vₑ, C₁:** IEC 60205.
+- **Core terminology and nomenclature:** IEC 60401-1 / -3.
+- **Wire enamel grades:** IEC 60317 series; NEMA MW 1000 (US-market).
+- **Conductor sizes:** IEC 60228 (metric), ASTM B258 (AWG).
+- **Insulation thermal classes:** IEC 60085.
+- **Comparative Tracking Index:** IEC 60112.
+- **Insulation coordination (clearance, creepage):** IEC 60664-1.
+- **Vocabulary:** IEC 60050-151 (electrical and magnetic devices), IEC 60050-221 (magnetic materials and components). Verbatim definitions reproduced in [`docs/normative-references.md`](docs/normative-references.md) §6b.
+- **Test methods:** IEC 60205, IEC 61007, IEC 62044, IEEE Std 393.
+- **Identifier registries:** ISO/IEC 11179-6 (IRDI), IEC 61360-4 / IEC CDD.
 
-class MAS {
-    
-    -Inputs inputs
-    -Magnetic magnetic
-    -Outputs outputs
+Where no standard exists — power-electronics ferrite grade nomenclature
+(N87, 3C95, …), powder-core alloy families (MPP, High Flux, Kool Mµ),
+litz wire construction — MAS encodes the data pragmatically. See
+`docs/normative-references.md` "Standardisation gaps".
 
-    +get_*()
-    +set_*()   
-}
-MAS ..> Inputs : Dependency
-MAS ..> Magnetic : Dependency
-MAS ..> Outputs : Dependency
+## Units and vocabulary
 
-class Inputs {
-    
-    -DesignRequirements design_requirements;
-    -List~OperatingPoint~ operating_points;
+[`docs/units.md`](docs/units.md) is the normative units table. All
+numeric fields carry SI units fixed by that document; values are bare
+numbers, not `{value, unit}` objects. Highlights: frequency in Hz,
+length in metres, temperature in degrees Celsius (per ISO 80000-5,
+which permits °C alongside K and recommends °C for everyday
+temperatures), magnetic flux density in tesla.
 
-    +get_*()
-    +set_*()    
-}
+Vocabulary follows IEV 60050-151 and 60050-221. Each MAS field
+description that introduces a domain term cites the relevant IEV
+reference number.
 
-class Magnetic {
-    
-    -String name
-    -MagneticCore core
-    -Coil coil
-    -List<DistributorInfo> distributors_info;
-    -MagneticManufacturerInfo manufacturer_info;
+## Reference implementation
 
-    +get_*()
-    +set_*()
-}
+The `MAS.hpp` header is a C++ reference binding generated from the
+schemas via [quicktype](https://quicktype.io/) and consumed by the
+[OpenMagnetics MKF](https://github.com/OpenMagnetics/MKF) library and
+its Python bindings (PyMKF). Conforming implementations need not use
+this binding — they need only consume MAS documents that validate
+against `schemas/MAS.json`. Build instructions for the reference
+implementation are in [`BUILD.md`](BUILD.md).
 
-class Outputs {
-    -Dict core_losses
-    -Dict leakage_inductance
-    -Dict magnetizing_inductance
-    -Dict winding_losses
-    -Dict winding_window_magnetic_strength_field
+## Reading the schema
 
-    +get_*()
-    +set_*()
-}
+- [`docs/quickref.md`](docs/quickref.md) — at-a-glance index of every field.
+- [`docs/schema.md`](docs/schema.md) — guided tour of the schema hierarchy.
+- [`docs/inputs.md`](docs/inputs.md) — detailed walk-through of the inputs section.
+- [`docs/magnetic.md`](docs/magnetic.md) — detailed walk-through of the magnetic section.
+- [`docs/units.md`](docs/units.md) — normative units table.
+- [`docs/glossary.md`](docs/glossary.md) — definitions of every term used in MAS, with IEC/IEV citations.
+- [`docs/normative-references.md`](docs/normative-references.md) — mapping of every MAS area to the standards it defers to.
 
-```
+## Examples
+
+Eight complete MAS documents under [`samples/complete/`](samples/complete/)
+cover buck, boost, flyback, forward (single-switch / two-switch /
+active-clamp), push-pull, isolated buck, isolated buck-boost and current
+transformer designs. Each one validates against `schemas/MAS.json`.
+
+A bundled component database under [`data/`](data/) contains 410+
+ferrite and powder materials, 300+ standard core shapes, 4 350+ wires
+and 300+ bobbins, all referenced by name from MAS documents.
+
+## Governance and contributing
+
+- [`GOVERNANCE.md`](GOVERNANCE.md) — stewardship roadmap, decision
+  rules, IPR.
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — DCO sign-off, PR checklist,
+  schema conventions.
+- [`MAINTAINERS.md`](MAINTAINERS.md) — current maintainers.
+- [`SECURITY.md`](SECURITY.md) — how to report security or IPR concerns.
+- [`proposals/`](proposals/) — RFCs for non-trivial changes.
+
+The project follows Semantic Versioning. Pre-1.0 minor breaks are
+permitted but flagged in [`CHANGELOG.md`](CHANGELOG.md); from 1.0
+onward, breaking changes require a MAJOR bump and a documented
+migration path.
+
+## License
+
+Apache-2.0. See [`LICENSE.md`](LICENSE.md). Each schema file carries an
+SPDX header. The patent grant in §3 of the licence is intended to keep
+the specification clear of IPR encumbrance for downstream users.
+
+## History
+
+MAS began at OpenMagnetics as a working data model for an
+inductor-design tool. As coverage grew it became useful as a
+standalone specification, independent of any one tool. Transfer to the
+PSMA Magnetics Committee is the next step. The schema lives openly on
+GitHub under Apache-2.0.

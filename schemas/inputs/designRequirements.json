@@ -1,273 +1,232 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "http://openmagnetics.com/schemas/inputs/designRequirements.json",
+    "$id": "https://psma.com/mas/inputs/designRequirements.json",
+    "$comment": "SPDX-License-Identifier: Apache-2.0",
     "title": "designRequirements",
-    "description": "The list of requirement that must comply a given magnetic",
-    "type": "object",
-    "properties": {
-        "name": {
-            "description": "A label that identifies these Design Requirements",
-            "type": "string"
+    "description": "The list of requirements that a given magnetic must comply with. Built on the shared PEAS designRequirementsBase (name, role, allowedTechnologies, market, topology, operatingTemperature, terminalType, maximumWeight, maximumDimensions, application, subApplication) plus the magnetic-specific requirements below. This makes MAS a PEAS citizen: a MAS designRequirements is also a valid PEAS designRequirementsBase.",
+    "allOf": [
+        {
+            "$ref": "https://psma.com/peas/utils.json#/$defs/designRequirementsBase"
         },
-        "magnetizingInductance": {
-            "description": "Required values for the magnetizing inductance",
-            "$ref": "/schemas/utils.json#/$defs/dimensionWithTolerance"
-        },
-        "turnsRatios": {
-            "description": "Required turns ratios between primary and the rest of windings",
-            "type": "array",
-            "items": {
-                "$ref": "/schemas/utils.json#/$defs/dimensionWithTolerance"
-            },
-            "minItems": 0
-        },
-        "minimumImpedance": {
-            "description": "List of minimum impedance at given frequency in the primary",
-            "type": "array",
-            "items": {
-                "type": "object",
-                "title": "impedanceAtFrequency",
-                "properties": {
-                    "impedance": {
-                        "$ref": "#/$defs/impedancePoint"
-                    },
-                    "frequency": {
-                        "type": "number",
-                        "minimum": 0
-                    }
-                },
-                "required": ["impedance", "frequency"]
-            },
-            "minItems": 1
-        },
-        "leakageInductance": {
-            "description": "Required values for the leakage inductance",
-            "type": "array",
-            "items": {
-                "$ref": "/schemas/utils.json#/$defs/dimensionWithTolerance"
-            },
-            "minItems": 0
-        },
-        "strayCapacitance": {
-            "description": "Required values for the stray capacitance",
-            "type": "array",
-            "items": {
-                "$ref": "/schemas/utils.json#/$defs/dimensionWithTolerance"
-            },
-            "minItems": 0
-        },
-        "isolationSides": {
-            "description": "Isolation side where each winding is connected to.",
-            "type": "array",
-            "items": {
-                "$ref": "/schemas/utils.json#/$defs/isolationSide"
-            },
-            "minItems": 1
-        },
-        "operatingTemperature": {
-            "description": "Required values for the temperature that the magnetic can reach under operating",
-            "$ref": "/schemas/utils.json#/$defs/dimensionWithTolerance"
-        },
-        "insulation": {
-            "title": "insulationRequirements",
+        {
             "type": "object",
             "properties": {
-                "altitude": {
-                    "description": "Required values for the altitude",
-                    "$ref": "/schemas/utils.json#/$defs/dimensionWithTolerance"
+                "magnetizingInductance": {
+                    "description": "Required values for the magnetizing inductance",
+                    "$ref": "../utils.json#/$defs/dimensionWithTolerance"
                 },
-                "cti": {
-                    "description": "Required CTI",
-                    "type": "string",
-                    "enum": ["Group I", "Group II", "Group IIIA", "Group IIIB"]
-                },
-                "pollutionDegree": {
-                    "description": "Required pollution for the magnetic to work under",
-                    "type": "string",
-                    "enum": ["P1", "P2", "P3"]
-                },
-                "overvoltageCategory": {
-                    "description": "Required overvoltage category",
-                    "type": "string",
-                    "enum": ["OVC-I", "OVC-II", "OVC-III", "OVC-IV"]
-                },
-                "insulationType": {
-                    "$ref": "/schemas/utils.json#/$defs/insulationType"
-                },
-                "mainSupplyVoltage": {
-                    "description": "Voltage RMS of the main supply to which this transformer is connected to.",
-                    "$ref": "/schemas/utils.json#/$defs/dimensionWithTolerance"
-                },
-                "standards": {
-                    "description": "VList of standards that will be taken into account for insulation.",
+                "turnsRatios": {
+                    "description": "Required turns ratios between primary and the rest of windings",
                     "type": "array",
                     "items": {
-                        "type": "string",
-                        "title": "insulationStandards",
-                        "enum": ["IEC 60664-1", "IEC 61558-1", "IEC 60335-1", "IEC 62368-1"]
+                        "$ref": "../utils.json#/$defs/dimensionWithTolerance"
+                    },
+                    "minItems": 0
+                },
+                "minimumImpedance": {
+                    "description": "List of minimum impedance at given frequency in the primary",
+                    "type": "array",
+                    "items": {
+                        "$ref": "../utils.json#/$defs/impedanceAtFrequency"
                     },
                     "minItems": 1
-                }
-            }
-        },
-        "shielding": {
-            "description": "List of electrostatic shields that must be placed between windings",
-            "type": "array",
-            "items": {
-                "title": "shieldingRequirement",
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "description": "A label that identifies this shield",
-                        "type": "string"
-                    },
-                    "type": {
-                        "description": "Construction of the shield: a continuous foil (near-complete coverage, must stay much thinner than a skin depth to limit eddy loss), or a screen wound from wire like a winding layer (runs on standard winding equipment, lower eddy loss, partial coverage)",
-                        "title": "shieldingType",
-                        "type": "string",
-                        "enum": [
-                            "foil",
-                            "wound"
-                        ],
-                        "default": "foil"
-                    },
-                    "wire": {
-                        "description": "Name of the wire the screen is wound from, when the shield type is wound. The shield layer thickness follows the wire outer diameter",
-                        "type": "string"
-                    },
-                    "betweenWindings": {
-                        "description": "Names of the two windings between which the shield must be placed, as windings are referenced by name throughout MAS. The shield is inserted at every interface where sections of these two windings are adjacent, unless restricted by interfaces",
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "minItems": 2,
-                        "maxItems": 2
-                    },
-                    "interfaces": {
-                        "description": "Zero-based ordinals of the insulation interfaces of the wound coil (counted in winding order, wrap-around interface last) at which the shield must be placed. If absent, the shield is placed at every interface where the two windings are adjacent",
-                        "type": "array",
-                        "items": {
-                            "type": "integer",
-                            "minimum": 0
-                        },
-                        "minItems": 1,
-                        "uniqueItems": true
-                    },
-                    "material": {
-                        "description": "Material of the shield, by default copper",
-                        "type": "string",
-                        "default": "copper"
-                    },
-                    "thickness": {
-                        "description": "Thickness of the shield, in m",
-                        "type": "number",
-                        "exclusiveMinimum": 0
-                    },
-                    "coverage": {
-                        "description": "Proportion of the winding window breadth covered by the shield, from 0 to 1. Ignored when margin is present",
-                        "type": "number",
-                        "exclusiveMinimum": 0,
-                        "maximum": 1,
-                        "default": 1
-                    },
-                    "margin": {
-                        "description": "Distances at the extremes of the winding window kept clear by the shield, in m. Two-element array, from 'inner or top' to 'outer or bottom', like section margins. Takes precedence over coverage",
-                        "type": "array",
-                        "items": {
-                            "type": "number",
-                            "minimum": 0
-                        },
-                        "minItems": 2,
-                        "maxItems": 2
-                    },
-                    "connection": {
-                        "description": "How the shield termination is connected. A shield terminates at one point only — the other end is left unconnected to avoid a shorted turn — so unlike windings there is a single connection instead of a start-finish pair",
-                        "$ref": "../magnetic/coil.json#/$defs/connection"
-                    },
-                    "terminatedTo": {
-                        "description": "Name of the winding whose quiet node the shield single-ended termination is connected to",
-                        "type": "string"
-                    }
                 },
-                "required": [
-                    "betweenWindings"
-                ]
+                "leakageInductance": {
+                    "description": "Required values for the leakage inductance",
+                    "type": "array",
+                    "items": {
+                        "$ref": "../utils.json#/$defs/dimensionWithTolerance"
+                    },
+                    "minItems": 0
+                },
+                "strayCapacitance": {
+                    "description": "Required values for the stray capacitance",
+                    "type": "array",
+                    "items": {
+                        "$ref": "../utils.json#/$defs/dimensionWithTolerance"
+                    },
+                    "minItems": 0
+                },
+                "isolationSides": {
+                    "description": "Isolation side where each winding is connected to.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "../utils.json#/$defs/isolationSide"
+                    },
+                    "minItems": 1
+                },
+                "insulation": {
+                    "title": "insulationRequirements",
+                    "type": "object",
+                    "properties": {
+                        "altitude": {
+                            "description": "Required values for the altitude",
+                            "$ref": "../utils.json#/$defs/dimensionWithTolerance"
+                        },
+                        "cti": {
+                            "description": "Required CTI",
+                            "type": "string",
+                            "enum": [
+                                "groupI",
+                                "groupII",
+                                "groupIIIA",
+                                "groupIIIB"
+                            ]
+                        },
+                        "pollutionDegree": {
+                            "description": "Required pollution for the magnetic to work under",
+                            "type": "string",
+                            "enum": [
+                                "PD1",
+                                "PD2",
+                                "PD3",
+                                "PD4"
+                            ]
+                        },
+                        "overvoltageCategory": {
+                            "description": "Required overvoltage category",
+                            "type": "string",
+                            "enum": [
+                                "I",
+                                "II",
+                                "III",
+                                "IV"
+                            ]
+                        },
+                        "insulationType": {
+                            "$ref": "../utils.json#/$defs/insulationType"
+                        },
+                        "mainSupplyVoltage": {
+                            "description": "Voltage RMS of the main supply to which this transformer is connected to.",
+                            "$ref": "../utils.json#/$defs/dimensionWithTolerance"
+                        },
+                        "standards": {
+                            "description": "List of standards that will be taken into account for insulation.",
+                            "type": "array",
+                            "items": {
+                                "type": "string",
+                                "title": "insulationStandards",
+                                "enum": [
+                                    "IEC 60664-1",
+                                    "IEC 61558-1",
+                                    "IEC 60335-1",
+                                    "IEC 62368-1"
+                                ]
+                            },
+                            "minItems": 1
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "shielding": {
+                    "description": "List of electrostatic shields that must be placed between windings",
+                    "type": "array",
+                    "items": {
+                        "title": "shieldingRequirement",
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "description": "A label that identifies this shield",
+                                "type": "string"
+                            },
+                            "type": {
+                                "description": "Construction of the shield: a continuous foil (near-complete coverage, must stay much thinner than a skin depth to limit eddy loss), or a screen wound from wire like a winding layer (runs on standard winding equipment, lower eddy loss, partial coverage)",
+                                "title": "shieldingType",
+                                "type": "string",
+                                "enum": ["foil", "wound"],
+                                "default": "foil"
+                            },
+                            "wire": {
+                                "description": "Name of the wire the screen is wound from, when the shield type is wound. The shield layer thickness follows the wire outer diameter",
+                                "type": "string"
+                            },
+                            "betweenWindings": {
+                                "description": "Names of the two windings between which the shield must be placed, as windings are referenced by name throughout MAS. The shield is inserted at every interface where sections of these two windings are adjacent, unless restricted by interfaces",
+                                "type": "array",
+                                "items": {"type": "string"},
+                                "minItems": 2,
+                                "maxItems": 2
+                            },
+                            "interfaces": {
+                                "description": "Zero-based ordinals of the insulation interfaces of the wound coil (counted in winding order, wrap-around interface last) at which the shield must be placed. If absent, the shield is placed at every interface where the two windings are adjacent",
+                                "type": "array",
+                                "items": {"type": "integer", "minimum": 0},
+                                "minItems": 1,
+                                "uniqueItems": true
+                            },
+                            "material": {
+                                "description": "Material of the shield, by default copper",
+                                "type": "string",
+                                "default": "copper"
+                            },
+                            "thickness": {
+                                "description": "Thickness of the shield, in m",
+                                "type": "number",
+                                "exclusiveMinimum": 0
+                            },
+                            "coverage": {
+                                "description": "Proportion of the winding window breadth covered by the shield, from 0 to 1. Ignored when margin is present",
+                                "type": "number",
+                                "exclusiveMinimum": 0,
+                                "maximum": 1,
+                                "default": 1
+                            },
+                            "margin": {
+                                "description": "Distances at the extremes of the winding window kept clear by the shield, in m. Two-element array, from 'inner or top' to 'outer or bottom', like section margins. Takes precedence over coverage",
+                                "type": "array",
+                                "items": {"type": "number", "minimum": 0},
+                                "minItems": 2,
+                                "maxItems": 2
+                            },
+                            "connection": {
+                                "description": "How the shield termination is connected. A shield terminates at one point only — the other end is left unconnected to avoid a shorted turn — so unlike windings there is a single connection instead of a start-finish pair",
+                                "$ref": "../magnetic/coil.json#/$defs/connection"
+                            },
+                            "terminatedTo": {
+                                "description": "Name of the winding whose quiet node the shield single-ended termination is connected to",
+                                "type": "string"
+                            }
+                        },
+                        "required": ["betweenWindings"]
+                    },
+                    "minItems": 0
+                },
+                "wiringTechnology": {
+                    "$ref": "../utils.json#/$defs/wiringTechnology"
+                }
             },
-            "minItems": 0
-        },
-        "market": {
-            "description": "Market where the magnetic will end up being used",
-            "type": "string",
-            "enum": ["Medical", "Commercial", "Industrial", "Military", "Space"]
-        },
-        "topology": {
-            "description": "Topology that will use the magnetic",
-            "type": "string",
-            "title": "topologies",
-            "enum": ["Buck Converter", "Boost Converter", "Inverting Buck-Boost Converter", "SEPIC", "Cuk Converter", "Zeta Converter", "Flyback Converter", "Two Switch Flyback Converter", "Active Clamp Forward Converter", "Single Switch Forward Converter", "Two Switch Forward Converter", "Push-Pull Converter", "Weinberg Converter", "Half-Bridge Converter", "Full-Bridge Converter", "Phase-Shifted Full-Bridge Converter"]
-
-        },
-        "application": {
-            "$ref": "/schemas/utils.json#/$defs/application"
-        },
-        "subApplication": {
-            "$ref": "/schemas/utils.json#/$defs/subApplication"
-        },
-        "wiringTechnology": {
-            "$ref": "/schemas/utils.json#/$defs/wiringTechnology"
-        },
-        "maximumWeight": {
-            "description": "Maximum weight for the designed magnetic, in Kg",
-            "type": "number"
-        },
-        "maximumDimensions": {
-            "description": "Maximum dimensions, width, height, and depth, for the designed magnetic, in m",
-            "type": "object",
-            "properties": {
-                "width": {
-                    "type": "number"
-                },
-                "height": {
-                    "type": "number"
-                },
-                "depth": {
-                    "type": "number"
-                }
-            }
-        },
-        "terminalType": {
-            "description": "Type of the terminal that must be used, per winding",
-            "type": "array",
-            "items": {
-                "$ref": "/schemas/utils.json#/$defs/connectionType"
-            }
+            "required": [
+                "magnetizingInductance",
+                "turnsRatios"
+            ]
         }
-    },
-    "required": ["magnetizingInductance", "turnsRatios"],
-
+    ],
+    "unevaluatedProperties": false,
     "$defs": {
-        "impedancePoint":{
+        "impedancePoint": {
             "description": "Data describing one impendance value",
             "title": "impedancePoint",
             "type": "object",
             "properties": {
-                "magnitude":{
+                "magnitude": {
                     "description": "Magnitude of the impedance, in Ohm",
                     "type": "number",
                     "minimum": 0
                 },
-                "phase":{
+                "phase": {
                     "type": "number"
                 },
-                "realPart":{
+                "realPart": {
                     "type": "number"
                 },
-                "imaginaryPart":{
+                "imaginaryPart": {
                     "type": "number"
                 }
             },
-            "required": ["magnitude"]
+            "required": [
+                "magnitude"
+            ],
+            "additionalProperties": false
         }
     }
 }

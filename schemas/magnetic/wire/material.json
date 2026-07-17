@@ -1,21 +1,24 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "http://openmagnetics.com/schemas/magnetic/wire/material.json",
+    "$id": "https://psma.com/mas/magnetic/wire/material.json",
+    "$comment": "SPDX-License-Identifier: Apache-2.0",
     "title": "wire/material",
     "description": "A material for wire",
     "type": "object",
     "properties": {
-        "name": {   
+        "name": {
             "description": "The name of a wire material",
             "type": "string"
         },
-        "permeability":{
+        "permeability": {
             "description": "The permeability of a wire material",
             "type": "number",
             "exclusiveMinimum": 0
         },
-        "resistivity":{"$ref": "#/$defs/resistivity"},
-        "thermalConductivity":{
+        "resistivity": {
+            "$ref": "#/$defs/resistivity"
+        },
+        "thermalConductivity": {
             "type": "array",
             "items": {
                 "$ref": "#/$defs/thermalConductivityPoint"
@@ -23,8 +26,11 @@
             "minItems": 1
         }
     },
-    "required": ["name", "permeability", "resistivity"],
-
+    "required": [
+        "name",
+        "permeability",
+        "resistivity"
+    ],
     "$defs": {
         "resistivity": {
             "description": "data for describing the resistivity of a wire",
@@ -44,23 +50,33 @@
                     "type": "number"
                 }
             },
-            "required": ["referenceValue", "referenceTemperature", "temperatureCoefficient"]
+            "required": [
+                "referenceValue",
+                "referenceTemperature",
+                "temperatureCoefficient"
+            ],
+            "additionalProperties": false
         },
         "thermalConductivityPoint": {
             "description": "data for describing one point of thermal conductivity",
             "type": "object",
             "properties": {
                 "value": {
-                    "description": "Thermal conductivity value, in W / m * K",
+                    "description": "Thermal conductivity value. Unit: W/(m*K).",
                     "type": "number",
                     "exclusiveMinimum": 0
                 },
                 "temperature": {
-                    "description": "Temperature for the field value, in Celsius",
+                    "description": "Temperature for the field value, in Celsius.",
                     "type": "number"
                 }
             },
-            "required": ["value", "temperature"]
+            "required": [
+                "value",
+                "temperature"
+            ],
+            "additionalProperties": false
         }
-    }
+    },
+    "additionalProperties": false
 }

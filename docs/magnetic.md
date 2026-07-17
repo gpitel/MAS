@@ -1,5 +1,15 @@
 # Magnetic
-I am going to separate into different specifications (and therefore files or entries in the database) anything that has to do with input to the system (operating points and requirements) from the physical system itself (the magnetic component). This first chapter describes how a magnetic can be described.
+
+> Walk-through of the `magnetic` section of a MAS document. For unit
+> conventions see [`units.md`](units.md); for the standards MAS defers
+> to and the IEV vocabulary anchors see
+> [`normative-references.md`](normative-references.md).
+
+The `magnetic` section describes the physical component itself —
+distinct from the inputs (operating points and design requirements) and
+from the outputs (computed results). It is composed of a `core` and a
+`coil`; the `coil` may reference a `bobbin`. This chapter walks through
+how each of these is described.
 
 It is a common practice of magnetics manufacturers to decouple cores (including gaps) and windings, having collections of compatible cores and wound bobbins, which allows having a multitude of different magnetics by combining them.
 
@@ -64,40 +74,34 @@ class Coil {
 }
 
 class MagneticManufacturerInfo {
-    -String cost
-    -String datasheet_url
     -String name
     -String reference
     -String status
-    -MagneticManufacturerRecommendations recommendations;
+    -Cost cost
+    -MagneticDatasheetInfo datasheetInfo
 
     +get_*()
     +set_*()
+}
+class Cost {
+    -Double value
+    -String currency
 }
 class DistributorInfo {
-    -Double cost;
-    -String country;
-    -String distributed_area;
-    -String email;
-    -String link;
-    -String name;
-    -String phone;
-    -Double quantity;
-    -String reference;
-    -String updated_at;
+    -Cost cost
+    -String country
+    -String distributed_area
+    -String email
+    -String link
+    -String name
+    -String phone
+    -Double quantity
+    -String reference
+    -String updated_at
 
     +get_*()
     +set_*()
 }
-MagneticManufacturerInfo ..> MagneticManufacturerRecommendations : Dependency
-
-class MagneticManufacturerRecommendations {
-    -Double rated_current;
-    -Double rated_current_temperature_rise;
-    -Double rated_magnetic_flux;
-
-    +get_*()
-    +set_*()
-}
+MagneticManufacturerInfo ..> Cost : Dependency
 
 ```

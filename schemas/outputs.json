@@ -1,94 +1,86 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "http://openmagnetics.com/schemas/outputs.json",
+    "$id": "https://psma.com/mas/outputs.json",
+    "$comment": "SPDX-License-Identifier: Apache-2.0",
     "title": "outputs",
     "description": "The description of the outputs that result of simulating a Magnetic",
     "type": "object",
     "properties": {
-        "coreLosses":{
+        "coreLosses": {
             "description": "Data describing the output core losses",
-            "$ref": "/schemas/outputs/coreLossesOutput.json"
+            "$ref": "./outputs/coreLossesOutput.json"
         },
-        "windingLosses":{
+        "windingLosses": {
             "description": "Data describing the output winding losses",
             "$ref": "#/$defs/windingLosses"
         },
-        "windingWindowCurrentField":{
+        "windingWindowCurrentField": {
             "description": "Data describing the output current field",
             "$ref": "#/$defs/windingWindowCurrentField"
         },
-        "windingWindowCurrentDensityField":{
-            "description": "Data describing the output current field",
-            "$ref": "#/$defs/windingWindowCurrentField"
+        "windingWindowCurrentDensityField": {
+            "description": "Data describing the output current density field",
+            "$ref": "#/$defs/windingWindowCurrentDensityField"
         },
-        "windingWindowMagneticStrengthField":{
+        "windingWindowMagneticStrengthField": {
             "description": "Data describing the output magnetic strength field",
             "$ref": "#/$defs/windingWindowMagneticStrengthField"
         },
-        "leakageInductance":{
-            "description": "Data describing the output leakage inductance",
-            "$ref": "#/$defs/leakageInductance"
+        "inductance": {
+            "description": "Data describing the output inductance",
+            "$ref": "#/$defs/inductance"
         },
-        "magnetizingInductance":{
-            "description": "Data describing the output magnetizing inductance",
-            "$ref": "#/$defs/magnetizingInductance"
-        },
-        "impedance":{
+        "impedance": {
             "description": "Data describing the output impedance",
             "$ref": "#/$defs/impedance"
         },
-        "temperature":{
+        "temperature": {
             "description": "Data describing the output temperature",
             "$ref": "#/$defs/temperature"
         },
-        "strayCapacitance":{
+        "strayCapacitance": {
             "description": "Data describing the output stray capacitance",
             "$ref": "#/$defs/strayCapacitance"
         },
-        "insulation":{
+        "insulation": {
             "description": "Data describing the output insulation that the magnetic has",
             "$ref": "#/$defs/insulation"
         },
-        "insulationCoordination":{
-            "description": "Data describing the output insulation coordination that the magnetic has",
-            "$ref": "#/$defs/insulationCoordination"
+        "insulationCoordination": {
+            "$ref": "https://psma.com/peas/outputs/insulationCoordination.json"
         }
     },
     "required": [],
-
     "$defs": {
-        "resultOrigin":{
-            "description": "Origin of the value of the result",
-            "type": "string",
-            "title": "resultOrigin",
-            "enum": ["manufacturer", "measurement", "simulation"]
+        "resultOrigin": {
+            "$ref": "https://psma.com/peas/utils.json#/$defs/resultOrigin"
         },
-        "windingLosses":{
+        "windingLosses": {
             "description": "Data describing the winding losses and the intermediate inputs used to calculate them",
             "title": "windingLossesOutput",
             "type": "object",
             "properties": {
-                "origin":{
+                "origin": {
                     "$ref": "#/$defs/resultOrigin"
                 },
                 "methodUsed": {
                     "description": "Model used to calculate the winding losses in the case of simulation, or method used to measure it",
                     "type": "string"
                 },
-                "currentPerWinding":{
-                    "description": "Excitation of the current per winding that produced the winding losses",
-                    "title": "currentPerWinding",
-                    "$ref": "/schemas/inputs/operatingPoint.json"
+                "currentPerWinding": {
+                    "description": "Excitation of the current per winding that produced the winding losses.",
+                    "title": "operatingPoint",
+                    "$ref": "./inputs/operatingPoint.json"
                 },
-                "currentDividerPerTurn":{
+                "currentDividerPerTurn": {
                     "description": "Excitation of the current per physical turn that produced the winding losses",
                     "title": "currentDividerPerTurn",
                     "type": "array",
                     "items": {
-                        "type": "number",
+                        "type": "number"
                     }
                 },
-                "temperature":{
+                "temperature": {
                     "description": "temperature in the winding that produced the winding losses",
                     "type": "number"
                 },
@@ -126,7 +118,7 @@
                     "title": "resistanceMatrix",
                     "type": "array",
                     "items": {
-                        "$ref": "#/$defs/resistanceMatrixAtFrequency"
+                        "$ref": "#/$defs/scalarMatrixAtFrequency"
                     }
                 },
                 "dcResistancePerTurn": {
@@ -146,55 +138,69 @@
                     }
                 }
             },
-            "required": ["origin", "methodUsed", "windingLosses"]
+            "required": [
+                "origin",
+                "methodUsed",
+                "windingLosses"
+            ],
+            "additionalProperties": false
         },
-        "temperature":{
+        "temperature": {
             "description": "Data describing the temperature and the intermediate inputs used to calculate them",
             "title": "temperatureOutput",
             "type": "object",
             "properties": {
-                "origin":{
+                "origin": {
                     "$ref": "#/$defs/resultOrigin"
                 },
                 "methodUsed": {
                     "description": "Model used to calculate the temperature in the case of simulation, or method used to measure it",
                     "type": "string"
                 },
-                "initialTemperature":{
+                "initialTemperature": {
                     "description": "Temperature of the magnetic before it started working. If missing ambient temperature must be assumed",
                     "type": "number"
                 },
-                "maximumTemperature":{
+                "maximumTemperature": {
                     "description": "maximum temperature reached",
                     "type": "number"
                 },
                 "temperaturePoint": {
                     "type": "object",
                     "properties": {
-                        "value":{
+                        "value": {
                             "description": "temperature at the point, in Celsius",
                             "type": "number"
                         },
                         "coordinates": {
                             "description": "The coordinates of the temperature point, referred to the center of the main column",
-                            "$ref": "/schemas/utils.json#/$defs/coordinates"
+                            "$ref": "./utils.json#/$defs/coordinates"
                         }
                     },
-                    "required": ["value", "coordinates"]
+                    "required": [
+                        "value",
+                        "coordinates"
+                    ],
+                    "additionalProperties": false
                 },
                 "bulkThermalResistance": {
-                    "description": "bulk thermal resistance of the whole magnetic",
+                    "description": "Bulk thermal resistance of the whole magnetic. Unit: K/W.",
                     "type": "number"
                 }
             },
-            "required": ["origin", "methodUsed", "maximumTemperature"]
+            "required": [
+                "origin",
+                "methodUsed",
+                "maximumTemperature"
+            ],
+            "additionalProperties": false
         },
-        "leakageInductance":{
+        "leakageInductance": {
             "description": "Data describing the leakage inductance and the intermediate inputs used to calculate them",
             "title": "leakageInductanceOutput",
             "type": "object",
             "properties": {
-                "origin":{
+                "origin": {
                     "$ref": "#/$defs/resultOrigin"
                 },
                 "methodUsed": {
@@ -205,107 +211,249 @@
                     "type": "array",
                     "items": {
                         "description": "Value of the leakage inductance between the primary and a secondary winding given by the position in the array",
-                        "$ref": "/schemas/utils.json#/$defs/dimensionWithTolerance",
+                        "$ref": "./utils.json#/$defs/dimensionWithTolerance",
                         "exclusiveMinimum": 0
                     }
                 }
             },
-            "required": ["origin", "methodUsed", "leakageInductancePerWinding"]
+            "required": [
+                "origin",
+                "methodUsed",
+                "leakageInductancePerWinding"
+            ],
+            "additionalProperties": false
         },
-        "strayCapacitance":{
+        "strayCapacitance": {
             "description": "Data describing the stray capacitance and the intermediate inputs used to calculate them",
             "title": "strayCapacitanceOutput",
             "type": "array",
             "items": {
                 "type": "object",
                 "properties": {
-                    "origin":{
+                    "origin": {
                         "description": "Origin of the value of the result",
                         "type": "string",
-                        "enum": ["manufacturer", "measurement", "simulation"]
+                        "enum": [
+                            "manufacturer",
+                            "measurement",
+                            "simulation"
+                        ]
                     },
                     "methodUsed": {
                         "description": "Model used to calculate the stray capacitance in the case of simulation, or method used to measure it",
                         "type": "string"
                     },
-                    "voltagePerTurn":{
+                    "voltagePerTurn": {
                         "description": "Voltage at the beginning of the physical turn",
                         "title": "voltagePerTurn",
                         "type": "array",
                         "items": {
-                            "type": "number",
+                            "type": "number"
                         }
                     },
-                    "voltageDividerStartPerTurn":{
+                    "voltageDividerStartPerTurn": {
                         "description": "Voltage divider at the start of the physical turn",
                         "title": "voltageDividerStartPerTurn",
                         "type": "array",
                         "items": {
-                            "type": "number",
+                            "type": "number"
                         }
                     },
-                    "voltageDividerEndPerTurn":{
+                    "voltageDividerEndPerTurn": {
                         "description": "Voltage divider at the end of the physical turn",
                         "title": "voltageDividerEndPerTurn",
                         "type": "array",
                         "items": {
-                            "type": "number",
+                            "type": "number"
+                        }
+                    },
+                    "voltageDropAmongTurns": {
+                        "description": "Voltage drop among all pair of adjacent turns",
+                        "title": "voltageDropAmongTurns",
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "capacitanceAmongTurns": {
+                        "description": "Capacitance among all pair of adjacent turns",
+                        "title": "capacitanceAmongTurns",
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "capacitanceAmongWindings": {
+                        "description": "Capacitance among all windings",
+                        "title": "capacitanceAmongWindings",
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "electricEnergyAmongTurns": {
+                        "description": "Electric energy among all pair of adjacent turns",
+                        "title": "electricEnergyAmongTurns",
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "number"
+                            }
+                        }
+                    },
+                    "maxwellCapacitanceMatrix": {
+                        "description": "List of Maxwell capacitance matrix per frequency",
+                        "title": "maxwellCapacitanceMatrix",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/$defs/scalarMatrixAtFrequency"
+                        }
+                    },
+                    "capacitanceMatrix": {
+                        "description": "List of capacitance matrix per frequency",
+                        "title": "capacitanceMatrix",
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/$defs/scalarMatrixAtFrequency"
+                            }
                         }
                     },
                     "sixCapacitorNetworkPerWinding": {
                         "description": "Network of six equivalent capacitors that describe the capacitance between two given windings",
                         "type": "object",
-                        "properties": {
-                            "C1":{
-                                "type": "number"
-                            },
-                            "C2":{
-                                "type": "number"
-                            },
-                            "C3":{
-                                "type": "number"
-                            },
-                            "C4":{
-                                "type": "number"
-                            },
-                            "C5":{
-                                "type": "number"
-                            },
-                            "C6":{
-                                "type": "number"
+                        "additionalProperties": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "object",
+                                "properties": {
+                                    "C1": {
+                                        "type": "number"
+                                    },
+                                    "C2": {
+                                        "type": "number"
+                                    },
+                                    "C3": {
+                                        "type": "number"
+                                    },
+                                    "C4": {
+                                        "type": "number"
+                                    },
+                                    "C5": {
+                                        "type": "number"
+                                    },
+                                    "C6": {
+                                        "type": "number"
+                                    }
+                                },
+                                "required": [
+                                    "C1",
+                                    "C2",
+                                    "C3",
+                                    "C4",
+                                    "C5",
+                                    "C6"
+                                ],
+                                "additionalProperties": false
                             }
-                        },
-                        "required": ["C1", "C2", "C3", "C4", "C5", "C6"]
+                        }
                     },
                     "tripoleCapacitancePerWinding": {
                         "description": "The three values of a three input electrostatic multipole that describe the capacitance between two given windings",
                         "type": "object",
-                        "properties": {
-                            "C1":{
-                                "type": "number"
-                            },
-                            "C2":{
-                                "type": "number"
-                            },
-                            "C3":{
-                                "type": "number"
+                        "additionalProperties": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "object",
+                                "properties": {
+                                    "C1": {
+                                        "type": "number"
+                                    },
+                                    "C2": {
+                                        "type": "number"
+                                    },
+                                    "C3": {
+                                        "type": "number"
+                                    }
+                                },
+                                "required": [
+                                    "C1",
+                                    "C2",
+                                    "C3"
+                                ],
+                                "additionalProperties": false
                             }
-                        },
-                        "required": ["C1", "C2", "C3"]
+                        }
                     }
-                },                    
+                },
                 "anyOf": [
-                    {"required": ["origin", "methodUsed", "sixCapacitorNetworkPerWinding"]},
-                    {"required": ["origin", "methodUsed", "tripoleCapacitancePerWinding"]}
+                    {
+                        "required": [
+                            "origin",
+                            "methodUsed",
+                            "sixCapacitorNetworkPerWinding"
+                        ]
+                    },
+                    {
+                        "required": [
+                            "origin",
+                            "methodUsed",
+                            "tripoleCapacitancePerWinding"
+                        ]
+                    }
                 ]
             }
         },
-        "magnetizingInductance":{
+        "inductance": {
+            "description": "Data describing the inductance",
+            "title": "inductanceOutput",
+            "type": "object",
+            "properties": {
+                "magnetizingInductance": {
+                    "$ref": "#/$defs/magnetizingInductance"
+                },
+                "leakageInductance": {
+                    "$ref": "#/$defs/leakageInductance"
+                },
+                "inductanceMatrix": {
+                    "description": "List of inductance matrix per frequency",
+                    "title": "inductanceMatrix",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/scalarMatrixAtFrequency"
+                    }
+                },
+                "couplingCoefficientsMatrix": {
+                    "description": "List of coupling coefficients matrix per frequency",
+                    "title": "couplingCoefficientsMatrix",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/scalarMatrixAtFrequency"
+                    }
+                }
+            },
+            "required": [
+                "magnetizingInductance"
+            ],
+            "additionalProperties": false
+        },
+        "magnetizingInductance": {
             "description": "Data describing the magnetizing inductance and the intermediate inputs used to calculate them",
             "title": "magnetizingInductanceOutput",
             "type": "object",
             "properties": {
-                "origin":{
+                "origin": {
                     "$ref": "#/$defs/resultOrigin"
                 },
                 "methodUsed": {
@@ -313,9 +461,40 @@
                     "type": "string"
                 },
                 "magnetizingInductance": {
-                    "description": "Value of the magnetizing inductance",
-                    "$ref": "/schemas/utils.json#/$defs/dimensionWithTolerance",
+                    "description": "Value of the magnetizing inductance. Unit: H. The operating point at which this value applies (frequency, AC test amplitude, DC bias, temperature) is recorded in the optional `measurementCondition` block; if absent, small-signal at 0 A DC bias and the ambient temperature of the operating point is assumed.",
+                    "$ref": "./utils.json#/$defs/dimensionWithTolerance",
                     "exclusiveMinimum": 0
+                },
+                "measurementCondition": {
+                    "description": "Operating point at which `magnetizingInductance` was measured or computed. All fields optional; absence implies the conventional small-signal default. See docs/normative-references.md.",
+                    "title": "inductanceMeasurementCondition",
+                    "type": "object",
+                    "properties": {
+                        "frequency": {
+                            "description": "Test frequency. Unit: Hz.",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                        },
+                        "voltageRms": {
+                            "description": "RMS test voltage applied across the winding (small-signal characterisation). Unit: V.",
+                            "type": "number",
+                            "exclusiveMinimum": 0
+                        },
+                        "currentRms": {
+                            "description": "RMS test current through the winding. Unit: A.",
+                            "type": "number",
+                            "minimum": 0
+                        },
+                        "dcBiasCurrent": {
+                            "description": "DC bias current through the winding at which this inductance was measured. Unit: A.",
+                            "type": "number"
+                        },
+                        "temperature": {
+                            "description": "Temperature at which this inductance was measured. Unit: Celsius.",
+                            "type": "number"
+                        }
+                    },
+                    "additionalProperties": false
                 },
                 "coreReluctance": {
                     "description": "Value of the reluctance of the core",
@@ -347,22 +526,27 @@
                     "type": "number"
                 },
                 "reluctancePerGap": {
-                    "description": "Value of the maximum magnetic energy storable in the gaps",
+                    "description": "Reluctance per gap in the magnetic core",
                     "type": "array",
                     "items": {
                         "$ref": "#/$defs/airGapReluctance"
                     }
                 }
-
             },
-            "required": ["origin", "methodUsed", "magnetizingInductance", "coreReluctance"]
+            "required": [
+                "origin",
+                "methodUsed",
+                "magnetizingInductance",
+                "coreReluctance"
+            ],
+            "additionalProperties": false
         },
-        "impedance":{
-            "description": "Data describing the impendance and the intermediate inputs used to calculate them",
+        "impedance": {
+            "description": "Data describing the impedance and the intermediate inputs used to calculate it",
             "title": "impedanceOutput",
             "type": "object",
             "properties": {
-                "origin":{
+                "origin": {
                     "$ref": "#/$defs/resultOrigin"
                 },
                 "methodUsed": {
@@ -374,7 +558,7 @@
                     "title": "resistanceMatrix",
                     "type": "array",
                     "items": {
-                        "$ref": "#/$defs/resistanceMatrixAtFrequency"
+                        "$ref": "#/$defs/scalarMatrixAtFrequency"
                     }
                 },
                 "inductanceMatrix": {
@@ -382,26 +566,32 @@
                     "title": "inductanceMatrix",
                     "type": "array",
                     "items": {
-                        "$ref": "#/$defs/inductanceMatrixAtFrequency"
+                        "$ref": "#/$defs/scalarMatrixAtFrequency"
                     }
                 },
                 "impedanceMatrix": {
                     "description": "List of impedance matrix per frequency",
-                    "title": "inductanceMatrix",
+                    "title": "impedanceMatrix",
                     "type": "array",
                     "items": {
-                        "$ref": "#/$defs/impedanceMatrixAtFrequency"
+                        "$ref": "#/$defs/complexMatrixAtFrequency"
                     }
-                },
+                }
             },
-            "required": ["origin", "methodUsed", "resistanceMatrix", "inductanceMatrix"]
+            "required": [
+                "origin",
+                "methodUsed",
+                "resistanceMatrix",
+                "inductanceMatrix"
+            ],
+            "additionalProperties": false
         },
-        "airGapReluctance":{
+        "airGapReluctance": {
             "description": "Data describing the reluctance of an air gap",
             "title": "airGapReluctanceOutput",
             "type": "object",
             "properties": {
-                "origin":{
+                "origin": {
                     "$ref": "#/$defs/resultOrigin"
                 },
                 "methodUsed": {
@@ -424,49 +614,62 @@
                     "exclusiveMinimum": 0
                 }
             },
-            "required": ["origin", "methodUsed", "reluctance", "fringingFactor", "maximumStorableMagneticEnergy"]
+            "required": [
+                "origin",
+                "methodUsed",
+                "reluctance",
+                "fringingFactor",
+                "maximumStorableMagneticEnergy"
+            ],
+            "additionalProperties": false
         },
         "windingWindowCurrentField": {
-            "description": "Data describing the curren in the different chunks used in field calculation",
+            "description": "Data describing the current in the different chunks used in field calculation",
             "title": "windingWindowCurrentFieldOutput",
             "type": "object",
             "properties": {
-                "origin":{
+                "origin": {
                     "$ref": "#/$defs/resultOrigin"
                 },
                 "methodUsed": {
                     "description": "Model used to calculate the current field",
                     "type": "string"
                 },
-                "fieldPerFrequency":{
+                "fieldPerFrequency": {
                     "type": "array",
                     "items": {
-                        "$ref": "/schemas/utils.json#/$defs/field"
+                        "$ref": "./utils.json#/$defs/field"
                     },
                     "minItems": 1
                 }
             },
-            "required": ["origin", "methodUsed", "fieldPerFrequency"]
+            "required": [
+                "origin",
+                "methodUsed",
+                "fieldPerFrequency"
+            ],
+            "additionalProperties": false
         },
         "windingWindowCurrentDensityField": {
-            "description": "Data describing the curren in the different chunks used in field calculation",
+            "description": "Data describing the current in the different chunks used in field calculation",
             "title": "windingWindowCurrentDensityFieldOutput",
             "type": "object",
             "properties": {
-                "origin":{
+                "origin": {
                     "$ref": "#/$defs/resultOrigin"
                 },
                 "methodUsed": {
                     "description": "Model used to calculate the current field",
                     "type": "string"
-                }, 
+                },
                 "wires": {
                     "type": "array",
                     "items": {
-
                         "title": "WireDataOrNameUnion",
                         "oneOf": [
-                            {"$ref": "/schemas/magnetic/wire.json"},
+                            {
+                                "$ref": "./magnetic/wire.json"
+                            },
                             {
                                 "description": "The name of the wire",
                                 "type": "string"
@@ -475,80 +678,71 @@
                     },
                     "minItems": 1
                 },
-                "fieldPerFrequency":{
+                "fieldPerFrequency": {
                     "type": "array",
                     "items": {
-                        "$ref": "/schemas/utils.json#/$defs/field"
+                        "$ref": "./utils.json#/$defs/field"
                     },
                     "minItems": 1
                 }
             },
-            "required": ["origin", "methodUsed", "wires", "fieldPerFrequency"]
+            "required": [
+                "origin",
+                "methodUsed",
+                "wires",
+                "fieldPerFrequency"
+            ],
+            "additionalProperties": false
         },
-        "windingWindowMagneticStrengthField":{
+        "windingWindowMagneticStrengthField": {
             "type": "object",
             "title": "windingWindowMagneticStrengthFieldOutput",
             "properties": {
-                "origin":{
+                "origin": {
                     "$ref": "#/$defs/resultOrigin"
                 },
                 "methodUsed": {
                     "description": "Model used to calculate the magnetic strength field",
                     "type": "string"
                 },
-                "fieldPerFrequency":{
+                "fieldPerFrequency": {
                     "type": "array",
                     "items": {
-                        "$ref": "/schemas/utils.json#/$defs/complexField"
+                        "$ref": "./utils.json#/$defs/complexField"
                     },
                     "minItems": 1
                 }
             },
-            "required": ["origin", "methodUsed", "fieldPerFrequency"]
+            "required": [
+                "origin",
+                "methodUsed",
+                "fieldPerFrequency"
+            ],
+            "additionalProperties": false
         },
-        "windingLossElementPerHarmonic":{
-            "description": "Data describing the losses due to either DC, skin effect, or proximity effect; in a given element, which can be winding, section, layer or physical turn",
-            "title": "windingLossElement",
-            "type": "object",
-            "properties": {
-                "origin":{
-                    "$ref": "#/$defs/resultOrigin"
-                },
-                "methodUsed": {
-                    "description": "Model used to calculate the magnetizing inductance in the case of simulation, or method used to measure it",
-                    "type": "string"
-                },
-                "lossesPerHarmonic": {
-                    "description": "Losses produced by each harmonic",
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    },
-                    "uniqueItems": false
-                },
-                "harmonicFrequencies": {
-                    "description": "List of frequencies of the harmonics that are producing losses",
-                    "type": "array",
-                    "items": {
-                        "type": "number"
-                    },
-                    "uniqueItems": true
-                }
-            },
-            "required": ["origin", "methodUsed", "lossesPerHarmonic", "harmonicFrequencies"]
+        "windingLossElementPerHarmonic": {
+            "$ref": "https://psma.com/peas/outputs/lossElementPerHarmonic.json"
         },
         "windingLossesPerElement": {
             "type": "object",
             "title": "windingLossesPerElement",
             "properties": {
-                "ohmicLosses":{
+                "name": {
+                    "description": "Name of the element",
+                    "type": "string"
+                },
+                "ohmicLosses": {
                     "description": "List of value of the winding ohmic losses",
                     "type": "object",
                     "properties": {
-                        "origin":{
+                        "origin": {
                             "description": "Origin of the value of the result",
                             "type": "string",
-                            "enum": ["manufacturer", "measurement", "simulation"]
+                            "enum": [
+                                "manufacturer",
+                                "measurement",
+                                "simulation"
+                            ]
                         },
                         "methodUsed": {
                             "description": "Model used to calculate the magnetizing inductance in the case of simulation, or method used to measure it",
@@ -559,53 +753,67 @@
                             "type": "number"
                         }
                     },
-                    "required": ["origin", "losses"]
+                    "required": [
+                        "origin",
+                        "losses"
+                    ],
+                    "additionalProperties": false
                 },
-                "skinEffectLosses":{
+                "skinEffectLosses": {
                     "description": "List of value of the winding skin losses per harmonic",
                     "$ref": "#/$defs/windingLossElementPerHarmonic"
                 },
-                "proximityEffectLosses":{
+                "proximityEffectLosses": {
                     "description": "List of value of the winding proximity losses per harmonic",
                     "$ref": "#/$defs/windingLossElementPerHarmonic"
                 }
-            }
+            },
+            "additionalProperties": false
         },
         "insulationCoordination": {
             "title": "insulationCoordinationOutput",
             "description": "List of voltages that the magnetic can withstand",
             "type": "object",
             "properties": {
-                "creepageDistance":{
-                    "description": "Creepage distance required for this magnetic",
+                "creepageDistance": {
+                    "description": "Creepage distance required for this magnetic. Unit: m.",
                     "type": "number",
                     "minimum": 0
                 },
-                "clearance":{
-                    "description": "Clearance required for this magnetic",
+                "clearance": {
+                    "description": "Clearance required for this magnetic. Unit: m.",
                     "type": "number",
                     "minimum": 0
                 },
-                "distanceThroughInsulation":{
-                    "description": "Distance through insulation required for this magnetic",
+                "distanceThroughInsulation": {
+                    "description": "Distance through insulation required for this magnetic. Unit: m.",
                     "type": "number",
                     "minimum": 0
                 },
                 "withstandVoltage": {
-                    "description": "Voltage that the magnetic withstands",
+                    "description": "Voltage that the magnetic withstands. Unit: V.",
                     "type": "number"
                 },
                 "withstandVoltageType": {
-                    "description": "Type of the voltage",
+                    "description": "Type of the voltage.",
                     "type": "string",
-                    "enum": ["AC", "DC"]
+                    "enum": [
+                        "AC",
+                        "DC"
+                    ]
                 },
                 "withstandVoltageDuration": {
-                    "description": "Duration of the voltate, or undefined if the field is not present",
+                    "description": "Duration of the voltage test. Unit: s. Absent if the test specification does not require a fixed duration.",
                     "type": "number"
                 }
             },
-            "required": ["creepageDistance", "clearance", "distanceThroughInsulation", "withstandVoltage"]
+            "required": [
+                "creepageDistance",
+                "clearance",
+                "distanceThroughInsulation",
+                "withstandVoltage"
+            ],
+            "additionalProperties": false
         },
         "insulation": {
             "title": "insulationOutput",
@@ -615,10 +823,14 @@
                 "type": "object",
                 "title": "dielectricVoltage",
                 "properties": {
-                    "origin":{
+                    "origin": {
                         "description": "Origin of the value of the result",
                         "type": "string",
-                        "enum": ["manufacturer", "measurement", "simulation"]
+                        "enum": [
+                            "manufacturer",
+                            "measurement",
+                            "simulation"
+                        ]
                     },
                     "methodUsed": {
                         "description": "Model used to calculate the voltage in the case of simulation, or method used to measure it",
@@ -631,61 +843,113 @@
                     "voltageType": {
                         "description": "Type of the voltage",
                         "type": "string",
-                        "enum": ["AC", "DC"]
+                        "enum": [
+                            "AC",
+                            "DC"
+                        ]
                     },
                     "duration": {
-                        "description": "Duration of the voltate, or undefined if the field is not present",
+                        "description": "Duration of the voltage test, or undefined if the field is not present",
                         "type": "number"
                     }
                 },
-                "required": ["origin", "voltage", "voltageType"]
+                "required": [
+                    "origin",
+                    "voltage",
+                    "voltageType"
+                ],
+                "additionalProperties": false
             },
             "minItems": 1
         },
-        "resistanceMatrixAtFrequency": {
-            "title": "resistanceMatrixAtFrequency",
+        "voltageDrop": {
+            "title": "voltageDrop",
             "type": "object",
             "properties": {
-                "magnitude": {
-                    "$ref": "/schemas/utils.json#/$defs/twoDimensionalMatrix"
+                "firstTurnName": {
+                    "description": "Name of the first turn",
+                    "type": "string"
                 },
-                "frequency":{
-                    "description": "Frequency of the resitance matrix",
+                "secondTurnName": {
+                    "description": "Name of the second turn",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "Voltage drop between two turns, in V",
                     "type": "number"
                 }
             },
-            "required": ["magnitude", "frequency"]
+            "required": [
+                "firstTurnName",
+                "secondTurnName",
+                "value"
+            ],
+            "additionalProperties": false
         },
-        "inductanceMatrixAtFrequency": {
-            "title": "inductanceMatrixAtFrequency",
+        "electricEnergy": {
+            "title": "electricEnergy",
             "type": "object",
             "properties": {
-                "magnitude": {
-                    "$ref": "/schemas/utils.json#/$defs/twoDimensionalMatrix"
+                "firstTurnName": {
+                    "description": "Name of the first turn",
+                    "type": "string"
                 },
-                "frequency":{
-                    "description": "Frequency of the inductance matrix",
+                "secondTurnName": {
+                    "description": "Name of the second turn",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "Electric energy between two turns, in J",
                     "type": "number"
                 }
             },
-            "required": ["magnitude", "frequency"]
+            "required": [
+                "firstTurnName",
+                "secondTurnName",
+                "value"
+            ],
+            "additionalProperties": false
         },
-        "impedanceMatrixAtFrequency": {
-            "title": "impedanceMatrixAtFrequency",
+        "scalarMatrixAtFrequency": {
+            "title": "scalarMatrixAtFrequency",
             "type": "object",
             "properties": {
                 "magnitude": {
-                    "$ref": "/schemas/utils.json#/$defs/twoDimensionalMatrix"
+                    "$ref": "./utils.json#/$defs/toleranceMatrix"
+                },
+                "frequency": {
+                    "description": "Frequency of the matrix",
+                    "type": "number"
+                }
+            },
+            "required": [
+                "magnitude",
+                "frequency"
+            ],
+            "additionalProperties": false
+        },
+        "complexMatrixAtFrequency": {
+            "title": "complexMatrixAtFrequency",
+            "type": "object",
+            "properties": {
+                "magnitude": {
+                    "$ref": "./utils.json#/$defs/toleranceMatrix"
                 },
                 "phase": {
-                    "$ref": "/schemas/utils.json#/$defs/twoDimensionalMatrix"
+                    "$ref": "./utils.json#/$defs/toleranceMatrix"
                 },
-                "frequency":{
-                    "description": "Frequency of the inductance matrix",
+                "frequency": {
+                    "description": "Frequency of the matrix",
                     "type": "number"
                 }
             },
-            "required": ["magnitude", "phase", "frequency"]
+            "required": [
+                "magnitude",
+                "phase",
+                "frequency"
+            ],
+            "additionalProperties": false
         }
-    }
+    },
+    "additionalProperties": false
 }
