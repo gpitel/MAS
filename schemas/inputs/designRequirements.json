@@ -200,8 +200,7 @@
                         },
                         "required": [
                             "betweenWindings"
-                        ],
-                        "additionalProperties": false
+                        ]
                     },
                     "minItems": 0
                 },
