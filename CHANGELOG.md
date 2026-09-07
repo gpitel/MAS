@@ -17,6 +17,201 @@ A change to the bundled component database (`data/*.ndjson`) follows the same
 rules: adding a material/shape/wire is MINOR, removing or renaming one is
 MAJOR.
 
+## [Unreleased]
+
+### Changed
+
+- **`resistivity` is no longer required on a core material.** It stays a defined,
+  documented property and every existing record keeps it; it is simply no longer
+  in the `required` list of `schemas/magnetic/core/material.json`.
+
+  Rationale (ABT #1039). Two facts made the requirement untenable. First, the
+  field is inert for the loss model most EMI-suppression ferrites use: in MKF,
+  core-material resistivity is read only by `CoreLossesRoshenModel`'s
+  eddy-current term and by `CoreMaterialCrossReferencer`'s similarity scoring,
+  never by the `lossFactor` path. Second, it cannot be estimated when a maker
+  does not publish it. Across NiZn grades at one permeability (mu_i 800-850) the
+  filed and published values span **five decades** — Ferroxcube 4A11 1e2 ohm-m,
+  Ferronics J 1e3, Meiwa J / ACME F80 / ACME M80 1e6, Fair-Rite 43 / Shinn Der
+  N4S / Encore N1 1e7 — because resistivity is set by Fe(II) content and
+  sintering, not by permeability. Requiring it therefore forced a fabricated
+  value, of the one property the material's own loss model would not read.
+
+  This unblocks real, shipping grades whose makers publish permeability,
+  saturation and a loss curve but no resistivity.
+
+  **Consumers of the generated bindings must regenerate and adapt.** The
+  quicktype type changes from `std::vector<ResistivityPoint>` to
+  `std::optional<std::vector<ResistivityPoint>>`, so call sites break at compile
+  time rather than silently. In MKF there are THREE, found by compiling rather
+  than by grepping — an early grep of mine was truncated and reported two:
+
+  - `ResistivityCoreMaterialModel::get_resistivity` — throw `MISSING_DATA` on a
+    disengaged optional, as it already does on empty data. No fallback.
+  - `CoreMaterialCrossReferencer::MagneticCoreFilterResistivity` — mirror the
+    Curie-temperature filter: no reference value skips the dimension, a candidate
+    without one is culled from that filter. Nothing substituted.
+  - `StrayCapacitance::core_image_factor` — the conduction-only branch is an
+    `else if`, so a material without resistivity falls through to the no-data case
+    already documented below it. Guard the optional, nothing else to decide.
+
+  Verified end to end on a clean `origin/main` worktree with this schema and those
+  three patches: MKF builds with 0 errors, and the catalogue plus one
+  resistivity-less material parses as 1079 records, 1078 with resistivity and 1
+  without. The same catalogue on the unpatched engine is rejected outright.
+
+  Until a consumer regenerates, it will REJECT a record that omits the field —
+  `nlohmann::json` raises `[json.exception.out_of_range.403] key 'resistivity'
+  not found` and, in MKF's case, the whole `load_core_materials` call fails, not
+  just that record. Land the regeneration before writing any record that omits it.
+
+### Added
+
+- **Optional `permittivity` on core materials.** Adds a `permittivity` object to
+  the core material schema with a `complex` part (ε′ + j·ε″, same sign
+  convention as complex permeability — the imaginary part is a positive loss
+  magnitude), mirroring the `complex` entry under `permeability`: a `real` and
+  an `imaginary` sub-object, each a new `permittivityPoint` (value, plus
+  optional temperature and frequency). Enables modelling of dimensional
+  effects (dimensional resonance) and displacement current in high-permittivity
+  ferrites, and the effective usable bandwidth of a given core size. Non-breaking:
+  the field is optional and existing materials are unaffected.
+- **Complex permittivity data for 7 MnZn power ferrites** — ML91S, ML95S, ML27D
+  (JFE), DMR51W, DMR96A (DMEGC), P63 (ACME) and 3F36 (Ferroxcube). ε'(f) and
+  ε''(f) over 0.1–10 MHz, digitized from Fig. 23 of A. Nabih, F. Jin,
+  R. Gadelrab and F. C. Lee, "Characterization and Mitigation of Dimensional
+  Effects on Core Loss in High-Power High-Frequency Converters," IEEE Trans.
+  Power Electron., 2023, doi: 10.1109/TPEL.2023.3285633
+  (https://ieeexplore.ieee.org/document/10149511). Values are read-offs from
+  log–log figures — expect ~5–10 % uncertainty.
+
+### Breaking
+
+- **Removed `masVersion` and `masConformance` top-level fields.** MAS documents
+  are the polymorphic payload of the shared PEAS container, and the PEAS root
+  object was closed (`additionalProperties: false`) to reject junk keys. Rather
+  than carve MAS-specific metadata into the shared root, both fields were removed.
+- **Retired the conformance-classes feature (RFC 0002).** With `masConformance`
+  gone, the Class A/B/C bundles (`schemas/conformance/`), their validator
+  (`scripts/validate-conformance.py`), the test vectors (`tests/conformance/`)
+  and `docs/conformance.md` were removed. RFC 0002 is marked Withdrawn.
+- **Removed `inputs.converterInformation`** (unused; the topology seed files
+  under `inputs/topologies/` remain for future use).
+- **`TMFD` (μi=14) replaced by `TMFD 60` / `TMFD 90` (data, ABT #185).** TDG's
+  own material workbook shows TMFD is an Fe-Si powder series in 60μ/90μ only —
+  the two "duplicate" DC-bias fits were the per-grade coefficients (60μ:
+  b=7.8e-7/c=1.70; 90μ: b=2.95e-7/c=2.23), and the μi=14 single record was a
+  botched merge of them. No cores referenced `TMFD`. The per-grade fits
+  reproduce TDG's published 82% μe@100 Oe (60μ) and the series loss
+  coefficients reproduce the published 450 kW/m³ @ 50 kHz/100 mT.
+- **Generic `Metglas` / `Finemet` records renamed to their actual alloy grades
+  (data, ABT #221).** Each was a single record flattening a whole alloy family.
+  Migration map for consumers that referenced a material by these bare names:
+  `Metglas` → `Metglas 2605SA1` (Fe-based amorphous, the workhorse; Tc 395 °C
+  matches 2605SA1), `Finemet` → `FT-3M` (FeCuNbSiB nanocrystalline; Bs 1.23 T /
+  Tc 570 °C match FT-3M). The fitted μ(T) and loss curves are unchanged, only
+  re-attributed. No cores or examples in MAS referenced the old bare names.
+  Additional grades (Metglas 2605S3A/2605HB1M/2714A, Finemet FT-3K50T, …) are
+  added separately (MINOR).
+
+Note: `scripts/migrate-to-1.0.py` still writes `masVersion` and is now obsolete.
+
+### Added
+
+- **`cableCore` datasheet electrical subtype (new `oneOf` branch on `magnetic.manufacturerInfo.datasheetInfo.electrical[]`)** —
+  clamp-on / cable ferrite cores (clip-on ferrites, cable rings, split/snap-on
+  suppressors): a 1-port common-mode suppression core the cable is threaded
+  through. Electrically a 1-port impedance like `chipBead`, but a distinct part
+  class — retrofit/threaded onto a cable rather than reflow-soldered — so a
+  consumer can query and prefer real cable cores for cable-level CM mitigation
+  instead of overloading `chipBead`. Carries `impedancePoints` (with the
+  existing per-point `current` for the DC-bias-derating curve), `numberTurns`,
+  `dcResistance`, `ratedCurrents`/`ratedCurrentPoints`, `impedanceTolerance`,
+  `selfResonantFrequency`, `mountingForm` (solidRing / snapOn / split /
+  screwable — retrofit clamp vs build-time ring) and `maximumCableOuterDiameter`
+  (the inner-diameter cable-fit limit, a primary cable-core selection param).
+  Multi-turn curves reuse the existing
+  one-electrical-entry-per-configuration idiom (a datasheet's 1/2/3-turn |Z|
+  tables become one entry each, discriminated by `numberTurns`), and the
+  toroid/ring geometry (inner/outer diameter, height) and ferrite material stay
+  in the shared core description — no geometry or material fields are duplicated
+  into the electrical block. Purely additive: every existing part still matches
+  exactly one `oneOf` branch (verified against a per-subtype sample of the
+  bundled catalog), and unknown-subtype-ignoring consumers are unaffected.
+  Motivation: Hertz's radiated cable-mitigation picker currently selects from
+  `chipBead` SMD beads for want of a cable-core class; this gives clamp-on cores
+  a first-class home once the parts are ingested.
+- **`saturationCurrentPeak` on the `commonModeChoke` electrical variant (ABT #279)** —
+  peak core-saturating bias current in Amperes for current-compensated CMCs, mirroring
+  the inductor variant's field. Motivation: 427 catalogued CMCs (WE-CMB/WE-LF/WE-CMBNC
+  among others) carry a datasheet I_sat that previously had no schema slot, blocking
+  their retag from the mistagged `inductor` variant.
+- **Magnetics (Mag Inc.) power ferrites (data, ABT #213): L, R, P, F, T** — first
+  Magnetics ferrite materials in the DB (their powder cores were already covered).
+  Constants from the 2021 ferrite catalog (μi, Bs@1194 A/m 25 °C, Br, Tc, ρ,
+  density, cross-checked against the parts database); loss model = Magnetics'
+  official per-range equations `P[W/m³] = a·f^x·B^y·(b−cT+dT²)` mapped verbatim
+  onto Steinmetz ranges (R/F/T reproduce the catalog's typical-loss table to ±3%);
+  the catalog typical points are stored in `advanced_core_materials`. Known
+  caveats: P's official equation overpredicts ~3× at 100 kHz vs the (internally
+  inconsistent) typical table — kept official, discrepancy tracked in ABT #213;
+  saturation has only the 25 °C point (Magnetics publishes no tabular 100 °C Bs);
+  J/W/M/C/E/V (high-perm/filter grades) still pending loss-factor data.
+- **6 more TDG MnZn ferrites (data): TPF26, TPW23, TP5H, TP5-B, TP5R, TP6** —
+  measured μi–T curves and Pcv points from TDG's material-performance workbook
+  with house-pipeline Steinmetz fits (13–31% mean error; TP6 split into
+  [1,3 MHz]+[3 MHz,1 GHz] ranges). These grades have **no public datasheet**;
+  Bs/Tc/resistivity/density are anchored on the closest documented family grade
+  (TPF26←TP4A, TPW23←TPW30, TP5H/TP6←TP5E, TP5-B/TP5R←TP5) and must be replaced
+  when TDG characteristic sheets arrive (ABT #196).
+- **5 TDG MnZn ferrites (data): TP4, TPW33, TPG33B, TPB16, TPB22** — built from
+  TDG's measured material-performance workbook (μi–T curves as the initial
+  permeability, manufacturer Pcv points) plus per-material datasheet constants
+  (Bs/Br/Hc/Tc/ρ/density; TPG33B constants from the 2025-11 automotive brochure,
+  ρ/density carried from the TPG33 base grade). TPW33/TPG33B get house-pipeline
+  Steinmetz fits (6.2% / 3.4% mean error, points in `advanced_core_materials`);
+  TP4/TPB16/TPB22 carry their measured Pcv points inline (single (f,B) sweeps —
+  a Steinmetz fit is not identifiable from them).
+- **TP4A initial permeability upgraded** from the single spec point (2400 @ 25 °C)
+  to the measured 24-point μi–T curve; TP4A/TP5 gained their measured Pcv–T
+  sweeps in `advanced_core_materials`.
+- **`frequencyFactor` on `pocoPermeabilityMethodData`** (optional `{a, b, c, d}`):
+  percent-of-initial logistic rolloff `(a / (1 + (f/b)^c) + d) * 0.01`, matching
+  the implementation MKF ships since ABT #169. Legalizes the 48 POCO V2026
+  records that already carried the fitted factors.
+
+### Fixed
+
+- **Non-physical Steinmetz ranges refitted (data, ABT #183):** 12 ranges that
+  validated but were physically garbage (β≈0: DMR28/DMR50B/DMR52/DMR51W/DN15P/JNP95;
+  α≈0: ACME P47/P5; overfits: SMP53/DMR51/PC200) refitted with the house pipeline
+  on manufacturer points from `advanced_core_materials`, normalized to `ct(25°C)=1`
+  and gated (α∈[0.5,3.5], β≥1). Two unsupportable extrapolation ranges (DMR51W
+  `[1,500k]`, P47 `[1M,1G]`) were deleted — MKF falls back to the neighbouring
+  healthy range. DMR51's refit (α=3.59) exceeds the α-gate by 0.09 as a documented
+  exception: the steepness is catalog-consistent (136 kW/m³ @ 3 MHz/10 mT/100 °C vs
+  DMEGC's ≤150 spec). P5 is now temperature-flat (its only temperature-varying
+  points were bogus, see below).
+- **JNP95 (data):** the B=150 mT and B=300 mT loss series in
+  `advanced_core_materials` were 1000× too small (kW/m³ digitized as W/m³).
+- **P5 (data):** removed the 18 f=700 Hz loss points — three conflicting values per
+  (f,B,T) and ~10⁵ W/m³ at 700 Hz/200 mT is impossible (frequency labels were lost
+  in digitization).
+- **`validate-db.py`:** merge-validates `massLosses` like `volumetricLosses` and
+  flags losses blocks without a non-empty `default` method list (mirrors the MKF
+  loader contract, ABT #184).
+- **Metglas, AF, AN (data):** manufacturer loss curves were W/kg values stored as
+  `volumetricLosses` (W/m³) — moved to `massLosses` (Nanoperm precedent), and the
+  Steinmetz fits made on those W/kg points rescaled `k × density` into true W/m³.
+- **Duplicate records (data):** 58 duplicated advanced lines removed (Kool Mµ /
+  XFlux / High Flux / Edge / FS / MS / HF families; kept the last of each name,
+  which is what MKF's last-wins merge already used); duplicate `XFlux 125`
+  (2023 fit superseded by the 2025-08 refit) and `TMFD` base lines removed.
+- **Nanoperm ×7 (data):** empty `volumetricLosses: {}` shells removed (undefined
+  behavior in MKF's C++ advanced-materials merge).
+- **M34 (data):** `datasheetUrl` pointed at M33's download path with the filename
+  swapped; now the real TDK M34 datasheet URL.
+
 ## [1.0.0] - 2026-04-27
 
 The breaking-changes release. Verified end-to-end against MKF

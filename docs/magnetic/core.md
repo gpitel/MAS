@@ -198,6 +198,16 @@ The fields needed to describe a shape are:
 * Family Subtype: When several forms are possible for a shape, this field represents the index of that subtype (e.g.: PM has two subtypes: 1 and 2)
 * Dimensions: Dictionary/Map holding the different dimensions of the shape, according to DIN EN 62317. It can contain different values due to tolerances, with variables for minimum, nominal and maximum dimensions.
 
+#### Letter conventions for the inductor-construction families
+
+Four families describe finished-inductor core constructions rather than DIN EN 62317 catalogue pieces. Their dimension letters are defined here (all values in meters, as everywhere in MAS):
+
+* **drum** (open magnetic circuit, ABT #331): a bobbin/dumbbell core wound in the groove. `A` flange OD, `A2` second flange OD when asymmetric, `B` total height, `C` post OD, `D` top flange thickness, `E` winding groove height, `F` bottom flange thickness, `H` bore (optional). Catalogue rows satisfy `D+E+F == B`. Its return path is air: no effective length exists and consumers must use an explicit open-core model, never the closed-circuit reluctance path.
+* **drumRing** (closed, core type `pieceAndPlate`, ABT #366): a drum closed by a concentric shield ring. Drum letters as above plus `J` ring OD, `K` ring ID, `L` ring height, with `K > A` required. The two annular radial clearances (`(K−A)/2` at each flange rim) are STRUCTURAL: consumers synthesize them as `residual` gapping entries; user-supplied gapping is rejected — nothing can be ground on the assembly.
+* **drumSemishielded** (closed, core type `closedShape`, ABT #362): a wound drum overcoated with magnetic epoxy (binder + magnetic powder) as a low-permeability return shell. Drum letters plus `J`/`K`/`L` for the shell envelope (rectangular bodies use `J`/`K` as the two footprint dimensions; square bodies have `J == K`). The shell material is carried by the core `coating` with `type: magneticEpoxy` and `material` naming a core-material record; the circuit crosses two materials, so single-`(Ae, le)` reluctance does not apply and consumers need the per-material path split. No gaps exist or may be supplied: the epoxy is cast in contact with the flange rims.
+* **molded** (closed, core type `closedShape`, ABT #357): a coil compression-molded inside a homogeneous soft-magnetic-composite block (distributed gap; the body is the circuit). `A` body width, `B` body height, `C` body depth, `D` coil-cavity height, `E` coil-cavity outer diameter, `F` coil-cavity inner diameter (the winding post). Constraints: `E > F`, `D < B`, `E < min(A, C)`.
+
+Shape records for these families may be catalogued when the bare-core pairing is public; assemblies whose dimensions come from confidential construction data must stay inline (`type: custom`) in the consuming MAS file and must not be added to the public shape data.
 
 ```mermaid
 classDiagram
@@ -314,6 +324,7 @@ For the case of the definition, the following field are defined, although, in co
     * Electrical Steel
 * Saturation: List of points defining the saturation at different temperatures. Each point must have its magnetic flux density, magnetic field strength, and temperature values.
 * Permeability: Dictionary/Map containing all the different possible permeabilities, of which the only mandatory is the Initial Permeability. Each permeability can be defined in two ways, either with a list of points or with an individual point. Each point is defined by a value as a minimum, but can carry more data, including temperature, magnetic field DC bias, frequency (which is commonly used for ferrites), or even modifier equations (as it is common for Powder materials). With this definition we can cover all from individual values, to temperature graphs, or equations. 
+* Permittivity (optional): Dictionary/Map holding the material's relative permittivity as a `complex` part (ε′ + j·ε″, the same sign convention as complex permeability — the imaginary part is a positive loss magnitude), mirroring the `complex` entry under permeability — a `real` and an `imaginary` sub-object, each a permittivity point (or a list of them) carrying at minimum a value, plus optionally temperature and frequency. MnZn ferrites in particular have a very large, frequency-dependent permittivity that — together with the permeability — sets the in-material wavelength and hence the onset of dimensional effects (dimensional resonance) and the effective usable bandwidth of a given core size. It is primarily relevant to high-frequency (MHz) modelling and to tools that account for displacement current.
 * VolumetricLosses: This is a list of possible methods for calculating the volumetric losses of the material. The options are:
     * Steinmetz coefficients: List of ranges defined by a minimum and maximum frequency, including the coefficients k, alpha and beta (and optionally ct0, ct1, and ct2, for temperature dependance) for calculating the volumetric losses for any method derived from Steinmetz.
     * Roshen coefficients: Values for calculating the volumetric losses according to Roshen’s method. The needed values are normally provided by the manufacturer: remanence, coercive force, resistivity, at optionally some reference volumetric losses.
@@ -637,6 +648,7 @@ The opposite step, from processed to functional, is done when selecting a magnet
 The width (x axis or A dimension according to DIN EN 62317), the height (y axis or B dimension according to DIN EN 62317), and the depth of the core (z axis or C dimension according to DIN EN 62317)
 ### Columns
 * List of elements, where each one represents one of the columns of the magnetic core, and has the following variables:
+* Name (optional): Name given to the column, so it can be referenced. If not present, the column is identified by its index in this list and by its coordinates.
 * Type: Central or Lateral
 * Shape: Shape of the column. It can be one of the following:
     * Oblong
@@ -656,6 +668,7 @@ The width (x axis or A dimension according to DIN EN 62317), the height (y axis 
 * Height/Radial Height: Vertical height of the winding window (y axis or B dimension according to DIN EN 62317). In the case of toroids, the radial height from the surface of the toroid towards its center.
 * Area: Area of the winding window.
 * Coordinates: The coordinates of the center of the winding window, referred to the center of the main column. In the case of half-sets, the center will be in the top point, where it would join another half-set.
+* Column (optional): Index of the column (in the columns list above) that the turns placed in this winding window are wound around. If not present, the main column is assumed (the first central column, or the first column if there is no central one). Windows wrapping different columns describe windings on different legs; windows sharing the same column value describe stacked chambers of a split bobbin. The coil side declares which window each winding/group/section is placed in (see the Winding Placement section of the coil documentation).
 ### Effective parameters
 The field contains the effective parameters as defined in DIN IEC 60205. They are:
 * Effective Length: Equivalent length that the magnetic flux travels through the core.

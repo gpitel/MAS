@@ -36,6 +36,7 @@
                 "MgZn",
                 "FeSiAl",
                 "FeSi",
+                "FeSiCr",
                 "FeNi",
                 "FeNiMo",
                 "FeMo",
@@ -169,6 +170,32 @@
             ],
             "additionalProperties": false
         },
+        "permittivity": {
+            "description": "Relative permittivity of the material. Ferrites (MnZn grades in particular) have a very large, frequency-dependent permittivity that, together with the permeability, sets the in-material electromagnetic wavelength lambda = c / (f * sqrt(mu' * eps')) and therefore the onset of dimensional effects (dimensional resonance) and the effective usable bandwidth of a given core size. Optional; primarily relevant to high-frequency (MHz) modelling and to tools that account for displacement current.",
+            "title": "permittivities",
+            "type": "object",
+            "properties": {
+                "complex": {
+                    "description": "Complex relative permittivity (eps' + j*eps''), following the same sign convention as complex permeability above: the imaginary part is stored as a positive loss magnitude. Used for dimensional-effect and displacement-current modelling at high frequency.",
+                    "title": "complexPermittivityData",
+                    "type": "object",
+                    "properties": {
+                        "real": {
+                            "$ref": "#/$defs/permittivity"
+                        },
+                        "imaginary": {
+                            "$ref": "#/$defs/permittivity"
+                        }
+                    },
+                    "required": [
+                        "real",
+                        "imaginary"
+                    ],
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        },
         "bhCycle": {
             "type": "array",
             "items": {
@@ -296,7 +323,6 @@
         "name",
         "permeability",
         "saturation",
-        "resistivity",
         "volumetricLosses",
         "manufacturerInfo"
     ],
@@ -316,6 +342,52 @@
                     "uniqueItems": true
                 }
             ]
+        },
+        "permittivity": {
+            "title": "permittivity",
+            "oneOf": [
+                {
+                    "$ref": "#/$defs/permittivityPoint"
+                },
+                {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/permittivityPoint"
+                    },
+                    "minItems": 1,
+                    "uniqueItems": true
+                }
+            ]
+        },
+        "permittivityPoint": {
+            "description": "data for describing one point of permittivity",
+            "title": "permittivityPoint",
+            "type": "object",
+            "properties": {
+                "value": {
+                    "description": "Relative permittivity value (dimensionless)",
+                    "type": "number"
+                },
+                "tolerance": {
+                    "description": "tolerance for the field value",
+                    "type": "number",
+                    "exclusiveMinimum": 0,
+                    "exclusiveMaximum": 1
+                },
+                "temperature": {
+                    "description": "temperature for the field value, in Celsius",
+                    "type": "number"
+                },
+                "frequency": {
+                    "description": "Frequency of the electric field, in Hz",
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                }
+            },
+            "required": [
+                "value"
+            ],
+            "additionalProperties": false
         },
         "lossFactorCoreLossesMethodData": {
             "description": "Loss factor method for estimating volumetric losses",
@@ -386,6 +458,10 @@
                 },
                 "magneticFluxDensityPeak": {
                     "description": "magnetic flux density peak for the field value, in T",
+                    "type": "number"
+                },
+                "magneticFieldPeak": {
+                    "description": "Peak magnetic field strength H of the measurement, in A/m. The H-side counterpart of magneticFluxDensityPeak: some manufacturers (e.g. Samwha) specify amplitude-permeability curves by peak H instead of peak B.",
                     "type": "number"
                 },
                 "magneticFieldDcBias": {
@@ -1052,6 +1128,31 @@
                 },
                 "magneticFieldDcBiasFactor": {
                     "description": "Field with the coefficients used to calculate how much the permeability decreases with the H DC bias, as factor = a + b * pow(H, c) + d",
+                    "type": "object",
+                    "properties": {
+                        "a": {
+                            "type": "number"
+                        },
+                        "b": {
+                            "type": "number"
+                        },
+                        "c": {
+                            "type": "number"
+                        },
+                        "d": {
+                            "type": "number"
+                        }
+                    },
+                    "required": [
+                        "a",
+                        "b",
+                        "c",
+                        "d"
+                    ],
+                    "additionalProperties": false
+                },
+                "frequencyFactor": {
+                    "description": "Field with the coefficients used to calculate how much the permeability decreases with frequency, as the percent-of-initial rolloff factor = (a / (1 + pow(f / b, c)) + d) * 0.01, with f in Hz. a is the rolling-off share, d the high-frequency asymptote (a + d = 100 at DC), b the corner frequency in Hz and c the steepness. Fitted to the permeability-vs-frequency curves of the POCO catalog.",
                     "type": "object",
                     "properties": {
                         "a": {

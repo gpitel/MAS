@@ -1,5 +1,4 @@
 {
-    "masVersion": "1.0.0",
     "inputs": {
         "designRequirements": {
             "name": "Common Mode Choke 10A",
@@ -111,14 +110,14 @@
                     "numberTurns": 15,
                     "numberParallels": 1,
                     "isolationSide": "primary",
-                    "wire": "Round 1.2 - Grade 1"
+                    "wire": "Round 1.25 - Grade 1"
                 },
                 {
                     "name": "Winding 2",
                     "numberTurns": 15,
                     "numberParallels": 1,
                     "isolationSide": "primary",
-                    "wire": "Round 1.2 - Grade 1"
+                    "wire": "Round 1.25 - Grade 1"
                 }
             ]
         }

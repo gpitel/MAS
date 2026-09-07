@@ -34,7 +34,8 @@
                         "twoPieceSet",
                         "pieceAndPlate",
                         "toroidal",
-                        "closedShape"
+                        "closedShape",
+                        "openShape"
                     ]
                 },
                 "material": {
@@ -46,8 +47,26 @@
                         {
                             "description": "The name of the material used in the core",
                             "type": "string"
+                        },
+                        {
+                            "description": "The materials of a multi-grade core assembly, primary piece first.",
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {
+                                "title": "CoreMaterialDataOrNameUnion",
+                                "oneOf": [
+                                    {
+                                        "$ref": "./core/material.json"
+                                    },
+                                    {
+                                        "description": "The name of the material used in this piece",
+                                        "type": "string"
+                                    }
+                                ]
+                            }
                         }
-                    ]
+                    ],
+                    "description": "The material(s) the core is made of. A single material (by record or by name) for the overwhelming majority of cores. A LIST when the assembly genuinely comprises pieces of different grades that the analytical models must treat separately — e.g. a shielded drum whose closing ring is a different ferrite from the drum (ABT #576). Order is significant: the FIRST entry is the primary piece (the drum / the wound piece), subsequent entries are the closing pieces in the order the magnetic circuit crosses them. A one-element list means the same thing as the bare form. For the molded family the entries are the REGIONS of one pressed body rather than separate pieces, in the order the flux crosses them from the post upward: a two-entry list is [post, rest] (the inner and outer powders of a body pressed in two steps), a three-entry list is [post, cover, base] (a body pressed in three steps: the base plate, the post, and the cover moulded over the coil). The reserved name \"air\" may stand in the post position only, and means the coil sits on a plastic bobbin with no magnetic post inside it (ABT #1002)."
                 },
                 "shape": {
                     "title": "CoreShapeDataOrNameUnion",
@@ -284,6 +303,11 @@
                         "U",
                         "Z"
                     ]
+                },
+                "column": {
+                    "description": "Index of the column (in the columns list of the core processed description) that the turns placed in this winding window are wound around. If not present, the main column is assumed (the first central column, or the first column if there is no central one)",
+                    "type": "integer",
+                    "minimum": 0
                 }
             },
             "required": [
@@ -349,6 +373,11 @@
                         "U",
                         "Z"
                     ]
+                },
+                "column": {
+                    "description": "Index of the column (in the columns list of the core processed description) that the turns placed in this winding window are wound around. If not present, the main column is assumed (the first central column, or the first column if there is no central one)",
+                    "type": "integer",
+                    "minimum": 0
                 }
             },
             "required": [
@@ -361,8 +390,12 @@
             "description": "Data describing a column of the core",
             "type": "object",
             "properties": {
+                "name": {
+                    "description": "Name given to the column, so it can be referenced. If not present, the column is identified by its index in the columns list and by its coordinates",
+                    "type": "string"
+                },
                 "type": {
-                    "description": "Name of the column",
+                    "description": "Type of the column, according to its position in the core: central column or lateral (return) column",
                     "type": "string",
                     "enum": [
                         "central",
@@ -397,6 +430,11 @@
                     "description": "Minimum depth of the column, if irregular",
                     "type": "number",
                     "exclusiveMinimum": 0
+                },
+                "cornerRadius": {
+                    "description": "Radius of the corners of the column cross-section, where a wire wound directly on the column bends around it. Only meaningful for rectangular and irregular columns: for a round column the radius is width / 2, and for an oblong one it is depth / 2. For a toroid it is the radius of the core cross-section edges (or of its coating, when coated), which is what the wire is pulled over",
+                    "type": "number",
+                    "minimum": 0
                 },
                 "height": {
                     "description": "Height of the column",

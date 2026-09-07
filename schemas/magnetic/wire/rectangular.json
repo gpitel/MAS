@@ -4,7 +4,7 @@
     "$comment": "SPDX-License-Identifier: Apache-2.0",
     "$ref": "./basicWire.json",
     "title": "wire/rectangular",
-    "description": "The description of a solid rectangular magnet wire",
+    "description": "The description of a solid rectangular magnet wire Discriminator: this file matches ONLY documents with type='rectangular' (enforced by the if/required/else:false conditional, which stays invisible to code generators so the shared wireType enum keeps generating as WireType).",
     "type": "object",
     "properties": {
         "conductingWidth": {
@@ -32,6 +32,17 @@
         "conductingWidth",
         "conductingHeight"
     ],
-    "$defs": {},
-    "unevaluatedProperties": false
+    "unevaluatedProperties": false,
+    "if": {
+        "properties": {
+            "type": {
+                "const": "rectangular"
+            }
+        },
+        "required": [
+            "type"
+        ]
+    },
+    "then": true,
+    "else": false
 }

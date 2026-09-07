@@ -44,10 +44,25 @@
                 "ut",
                 "t",
                 "drum",
+                "drumRing",
+                "drumSemishielded",
+                "drumPlate",
+                "molded",
                 "rod",
                 "ei",
                 "h",
-                "c"
+                "c",
+                "eer",
+                "epc",
+                "epq",
+                "epw",
+                "ept",
+                "lep",
+                "ef",
+                "rs",
+                "ds",
+                "hs",
+                "block"
             ]
         },
         "magneticCircuit": {

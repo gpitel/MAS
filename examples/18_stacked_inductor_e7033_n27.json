@@ -1,5 +1,4 @@
 {
-    "masVersion": "1.0.0",
     "inputs": {
         "designRequirements": {
             "magnetizingInductance": {
@@ -60,6 +59,10 @@
                         },
                         "outerHeight": {
                             "nominal": 0.0011
+                        },
+                        "coating": {
+                            "type": "enamelled",
+                            "grade": 1
                         }
                     }
                 }
@@ -87,5 +90,6 @@
                 "numberStacks": 2
             }
         }
-    }
+    },
+    "outputs": []
 }
