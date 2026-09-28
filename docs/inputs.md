@@ -32,16 +32,20 @@ Inputs ..> OperatingPoint : Dependency
 class DesignRequirements {
 
     InsulationRequirements insulation;
+    List<IsolationSide> isolation_sides;
     List<DimensionWithTolerance> leakage_inductance;
     DimensionWithTolerance magnetizing_inductance;
     Market market;
-    List<Double> maximum_dimensions;
+    MaximumDimensions maximum_dimensions;
     Double maximum_weight;
+    List<ImpedanceAtFrequency> minimum_impedance;
     String name;
     DimensionWithTolerance operating_temperature;
+    List<DimensionWithTolerance> stray_capacitance;
     List<TerminalType> terminal_type;
     String topology;
     List<DimensionWithTolerance> turns_ratios;
+    WiringTechnology wiring_technology;
 
     +get_*()
     +set_*()
@@ -76,10 +80,20 @@ As many of the requirements don’t usually have a fixed value, providing instea
 
 This object must have the following fields:
 
+The general-purpose fields (Name, Market, Topology, Operating Temperature, Terminal Type, Maximum Weight, Maximum Dimensions) are inherited from the shared PEAS `designRequirementsBase` (`PEAS/schemas/utils.json`), which also provides the optional `role`, `allowedTechnologies`, `application` and `subApplication` fields; the magnetic-specific fields are added on top by MAS.
+
 * Name: Reference name of the design requirements.
 * Magnetizing Inductance: Numeric requirement representing the inductance that the magnetic must have in order to work.
 * Turns ratios: List of numeric requirements, where each element represents the turns ratio that a secondary winding must have referred to the primary. An empty list represents a component with only the primary (a basic inductor)
 * Leakage inductance (optional): List of numeric requirements, where each element represents the leakage inductance that a secondary winding must have referred to the primary.
+* Stray Capacitance (optional): List of numeric requirements, where each element represents the stray capacitance that a winding must have.
+* Minimum Impedance (optional): List of minimum impedances at given frequencies in the primary, where each element pairs a frequency with an impedance point.
+* Isolation Sides (optional): List indicating the isolation side (`primary`, `secondary`, `tertiary`, ...) that each winding is connected to.
+* Wiring Technology (optional): Technology that must be used to create the wiring. It can be one of the following:
+    * `wound`
+    * `printed`
+    * `stamped`
+    * `deposition`
 * Operating Temperature (optional): Numeric requirement representing the temperature that the magnetic can reach under operating.
 * Insulation requirements (optional): Field needed to calculate the insulation requirements.
     * Altitude (optional): Numeric requirement representing the altitude at which the magnetic will work, in order to calculate insulation requirements.
@@ -104,13 +118,20 @@ This object must have the following fields:
         * `PD2` — Non-conductive pollution; occasional condensation
         * `PD3` — Conductive pollution or dry pollution that becomes conductive
         * `PD4` — Persistent conductive pollution
+    * Main Supply Voltage (optional): Numeric requirement representing the RMS voltage of the main supply to which this transformer is connected to.
+    * Standards (optional): List of standards that will be taken into account for insulation. Each element can be one of the following:
+        * `IEC 60664-1`
+        * `IEC 61558-1`
+        * `IEC 60335-1`
+        * `IEC 62368-1`
 * Market (optional): Market where the magnetic will end up being used. It can be one of the following:
     * `medical`
     * `commercial`
     * `industrial`
+    * `automotive`
     * `military`
     * `space`
-* Maximum Dimensions (optional): Maximum dimensions, width, height, and depth, for the designed magnetic, in m.
+* Maximum Dimensions (optional): Object with `width`, `height`, and `depth` fields giving the maximum bounding-box dimensions for the designed magnetic, in m.
 * Maximum Weight (optional): Maximum weight for the designed magnetic, in kg.
 * Terminal Type (optional): Type of the terminal that must be used, per winding. It can be one of the following:
     * `pin`
@@ -119,6 +140,7 @@ This object must have the following fields:
     * `flyingLead`
     * `tht`
     * `pcbPad`
+    * `chassis`
 * Topology: Topology that will use the magnetic.
 
 
@@ -129,16 +151,20 @@ classDiagram
 class DesignRequirements {
 
     InsulationRequirements insulation;
+    List<IsolationSide> isolation_sides;
     List<DimensionWithTolerance> leakage_inductance;
     DimensionWithTolerance magnetizing_inductance;
     Market market;
-    List<Double> maximum_dimensions;
+    MaximumDimensions maximum_dimensions;
     Double maximum_weight;
+    List<ImpedanceAtFrequency> minimum_impedance;
     String name;
     DimensionWithTolerance operating_temperature;
+    List<DimensionWithTolerance> stray_capacitance;
     List<TerminalType> terminal_type;
     String topology;
     List<DimensionWithTolerance> turns_ratios;
+    WiringTechnology wiring_technology;
 
     +get_*()
     +set_*()
@@ -153,8 +179,10 @@ class InsulationRequirements {
     DimensionWithTolerance altitude;
     Cti cti;
     InsulationType insulation_type;
+    DimensionWithTolerance main_supply_voltage;
     OvervoltageCategory overvoltage_category;
     PollutionDegree pollution_degree;
+    List<InsulationStandards> standards;
 
     +get_*()
     +set_*()
@@ -203,13 +231,15 @@ class OvervoltageCategory {
 
 class PollutionDegree {
     <<enumeration>>
-    P1
-    P2
-    P3
+    PD1
+    PD2
+    PD3
+    PD4
 }
 
 class Market {
     <<enumeration>>
+    AUTOMOTIVE
     COMMERCIAL
     INDUSTRIAL
     MEDICAL
@@ -219,10 +249,13 @@ class Market {
 
 class TerminalType {
     <<enumeration>>
-    FLYIND_LEAD
+    CHASSIS
+    FLYING_LEAD
+    PCB_PAD
     PIN
     SCREW
     SMT
+    THT
 }
 ```
 
@@ -354,13 +387,13 @@ The first level of definition is the direct waveform, and contains the following
 The second level of definition is the processed data about the waveform, from which the waveform itself can be built back. Additionally, they are designed to quickly provide for the values necessary in most analytical models. It contains the following fields:
 * Label: Label of the waveform, if applicable. Used for common waveforms. If `custom`, the proper waveform must be defined. It can be one of the following:
     * `custom`
-    * `triangular`
+    * `triangular`, `triangularWithDeadtime`
     * `sinusoidal`
-    * `rectangular`
+    * `rectangular`, `rectangularWithDeadtime`, `rectangularDCM`
     * `unipolarRectangular`, `unipolarTriangular`
     * `bipolarRectangular`, `bipolarTriangular`
-    * `flybackPrimary`, `flybackSecondary`
-    * `rectangularWithDeadtime`, `rectangularDCM`
+    * `flybackPrimary`, `flybackSecondary`, `flybackSecondaryWithDeadtime`
+    * `secondaryRectangular`, `secondaryRectangularWithDeadtime`
 * Duty Cycle: The duty cycle of the waveform, if applicable.
 * Peak To Peak: The peak to peak value of the waveform.
 * Peak: The maximum positive value of the waveform.
@@ -451,6 +484,16 @@ Voltage: Electromagnetic Parameter representing the voltage that falls at the wi
 Magnetizing Current: Electromagnetic Parameter representing the part of the current used in magnetizing the magnetic core and generating the magnetic field. For inductors with one winding it is equal to the current field.
 Magnetic Flux Density: Electromagnetic Parameter representing the magnetic flux density circulating through the magnetic core, induced by the magnetizing current.
 Magnetic Field Strength: Electromagnetic Parameter representing the magnetic field strength circulating through the magnetic core, induced by the magnetizing current.
+
+#### Sign convention of the excitations
+Every winding of a magnetic is linked by the same core flux, so the signs of its voltage and current waveforms must be stated relative to one common reference, or the relative sense of the windings, and with it the magnetizing current, cannot be recovered. The excitations of an operating point follow this convention:
+
+- **Reference winding.** The first winding (in `coil.functionalDescription` order) whose `isolationSide` is `primary`. Its number of turns is N_r and its magnetizing inductance is the design's magnetizing inductance.
+- **Voltages in the common dot reference.** The voltage of every winding is its terminal voltage signed so that, for an ideal transformer, v_k(t) = N_k dΦ/dt for one shared flux Φ: all winding voltages are positive together while the flux rises. A winding that conducts in the other half of the period (the second half of a push-pull primary or of a centre-tapped secondary, a forward converter's demagnetisation winding) is NOT given in its own "positive while conducting" reference: its voltage is in phase with the reference winding's, like every other winding's.
+- **Currents.** Windings on the `primary` isolation side, including demagnetisation or reset windings, use the PASSIVE convention: a positive current enters the dotted terminal. All other windings use the SOURCE convention: a positive current leaves the dotted terminal (the diode current of an output winding is positive).
+- **Magnetizing current.** With c_k = +1 for primary-side windings and -1 for the others, the magnetizing current referred to the reference winding is i_m(t) = Σ_k c_k N_k i_k(t) / N_r, and v_r(t) = L_m di_m/dt apart from the leakage and resistive drops.
+
+A consistent operating point satisfies these identities: at the fundamental, every winding's voltage phasor lies within a few degrees of the reference winding's, and |V_r| / (2π f |I_m|) equals the magnetizing inductance. Consumers that superpose the fields of several windings (proximity losses, leakage) use c_k times each winding's current, with the phase of every harmonic taken from the waveform: two windings are not in general in exact phase or antiphase (a flyback's primary and secondary fundamentals are about 135° apart).
 
 Wrapping up the inputs
 As happened with the magnetic, the MAS format for the inputs can include quite a lot of information, but it is designed so all that information can be calculated from a small specification file, perfectly understandable by humans and software.

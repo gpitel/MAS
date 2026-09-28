@@ -156,6 +156,9 @@ names that are not literal property keys are written in plain prose.
 | `pollutionDegree` | Pollution level per IEC 60664-1 §4.2: `PD1`, `PD2`, `PD3`, `PD4`. |
 | `overvoltageCategory` | Overvoltage category per IEC 60664-1 §4.3: `I`, `II`, `III`, `IV`. |
 | `surfaceResistivity` | Surface resistivity per IEC 60093, in Ω/sq. |
+| `form` | The form an insulation material is supplied in: `tape`, `film`, `sleeve` or `varnish`. It is what lets a coordinator pick sleeve stock rather than tape. |
+| `cti` (insulation material) | The measured comparative tracking index per IEC 60112, in V, from which the material group above follows per IEC 60664-1. |
+| `sleeve` | Insulating tube slid over a lead, from its terminal back into the winding; recorded on a coil `connection` with its material, wall thickness, inner diameter, overlap into the winding and number of layers. |
 | `meltingPoint` | Temperature at which the insulation material melts, in degrees Celsius. |
 | `interlayerInsulation` | Insulation barrier placed between adjacent layers of a winding. |
 | `marginInfo` | Margin tape at the extremes of a section, used to enforce creepage. |
@@ -207,6 +210,7 @@ names that are not literal property keys are written in plain prose.
 |------|------------|
 | `manufacturerInfo` | Manufacturer-supplied identification for a part. |
 | `distributorInfo` | Distributor-supplied identification, stocking, and price information for a part. |
+| `substituteInfo` | A replacement part: `{ partNumber, manufacturer, type, notes, source }`, listed in the magnetic's `substitutesInfo`. `type: successor` means this part is superseded by the named one, one hop, as the manufacturer states it; the other types (`drop-in`, `near-equivalent`, `functional`, `upgrade`, `downgrade`) are second sources. Shared PEAS type (PEAS-RFC 0002). |
 | `cost` | Monetary value with explicit currency: `{ value, currency }` where `currency` is an ISO 4217 three-letter code. |
 | `irdi` | International Registration Data Identifier per ISO/IEC 11179-6 / ISO 29002-5, in the form `RAI#DI#VI`. |
 | `datasheetInfo` | Catalogue-level data extracted directly from the manufacturer's datasheet. |
@@ -237,5 +241,6 @@ came from. Optional and closed, so records without it remain valid. Each entry:
 
 It is a **list**: a record may combine sources (e.g. specs from the datasheet, a rated
 voltage from a distributor, a missing field back-filled by librarian enrichment). The
-canonical definition lives in `PEAS/schemas/utils.json#/$defs/provenance` (mirrored in
-`MAS/schemas/utils.json`, which is self-contained).
+canonical definition lives in `PEAS/schemas/utils.json#/$defs/provenance` (aliased by
+`MAS/schemas/utils.json` via `$ref`, as are the other shared definitions such as
+`dimensionWithTolerance`).

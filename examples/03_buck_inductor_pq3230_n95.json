@@ -1,12 +1,11 @@
 {
-    "masVersion": "1.0.0",
     "inputs": {
         "designRequirements": {
             "magnetizingInductance": {
                 "nominal": 2.2e-05
             },
             "turnsRatios": [],
-            "topology": "Buck"
+            "topology": "buckConverter"
         },
         "operatingPoints": [
             {
@@ -61,6 +60,10 @@
                         },
                         "outerHeight": {
                             "nominal": 0.0006000000000000001
+                        },
+                        "coating": {
+                            "type": "enamelled",
+                            "grade": 1
                         }
                     }
                 }
@@ -88,5 +91,6 @@
                 "numberStacks": 1
             }
         }
-    }
+    },
+    "outputs": []
 }

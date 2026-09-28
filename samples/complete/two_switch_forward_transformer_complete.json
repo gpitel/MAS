@@ -1,5 +1,4 @@
 {
-    "masVersion": "1.0.0",
     "inputs": {
         "designRequirements": {
             "name": "Two Switch Forward Transformer 400V to 5V 20A",
@@ -123,7 +122,7 @@
                     "numberTurns": 80,
                     "numberParallels": 1,
                     "isolationSide": "primary",
-                    "wire": "Litz 30x0.1 - Grade 1"
+                    "wire": "Litz 30x0.1 - Grade 1 - Unserved"
                 },
                 {
                     "name": "Secondary",

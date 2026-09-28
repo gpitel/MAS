@@ -6,6 +6,10 @@
     "description": "The description of a magnetic",
     "type": "object",
     "properties": {
+        "name": {
+            "type": "string",
+            "description": "Human-readable name/reference of this magnetic component (e.g. the design or part label)."
+        },
         "core": {
             "description": "Data describing the magnetic core.",
             "$ref": "./magnetic/core.json"
@@ -38,9 +42,159 @@
             },
             "uniqueItems": false
         },
+        "substitutesInfo": {
+            "description": "Replacement parts for this one: manufacturer-named successors and second sources. An entry with type 'successor' means THIS part is superseded by the named one, one hop, as the manufacturer states it - never inferred from a status of obsolete or from part-number similarity. The schema cannot check that the named part exists in the catalogue, or exists exactly once; that is the referential pass's job, as for CIAS component URIs. Evidence for the claim goes in the record's provenance[] with fields: [\"substitutesInfo\"], carrying the same sourceUrl, retrievedDate and verification stamp as any datasheet field.",
+            "type": "array",
+            "items": {
+                "$ref": "https://psma.com/peas/utils.json#/$defs/substituteInfo"
+            }
+        },
         "rotation": {
             "description": "The rotation of the magnetic, by default the winding column goes vertical",
             "$ref": "./utils.json#/$defs/rotation"
+        },
+        "coreElectricalReference": {
+            "description": "How the core is referenced electrically in the assembled component. A ferrite or powder core has no terminal of its own: it sits at whatever potential the surrounding conductors impose on it, unless it is deliberately bonded, through a mounting clip, a copper strap or flux band, or conductive tape, to a circuit reference or to one end of a winding. The choice decides how the winding-to-core capacitances appear at the terminals (a charge-balanced floating node gives C0/12 of a winding's distributed capacitance for a linear potential ramp; a core tied to either end of that winding gives C0/3; the live end innermost against a bonded core approaches C0) and whether the primary-to-core-to-secondary common-mode path is closed through the core or diverted to the reference. Absent means floating: a core with no clip, strap or tape, which is also the assumption every model made before this field existed.",
+            "title": "coreElectricalReference",
+            "type": "object",
+            "properties": {
+                "type": {
+                    "description": "floating: the core is not bonded to anything and takes the charge-balanced potential of the conductors around it. grounded: the core is bonded to a reference node with no potential swing relative to the circuit reference of the side given by isolationSide (its local ground), or to protective earth or chassis when isolationSide is absent. tiedToWinding: the core is bonded to one end of a named winding and follows that node's potential.",
+                    "title": "coreElectricalReferenceType",
+                    "type": "string",
+                    "enum": [
+                        "floating",
+                        "grounded",
+                        "tiedToWinding"
+                    ]
+                },
+                "isolationSide": {
+                    "description": "For type grounded: the isolation side whose local reference the core is bonded to (primary ground, secondary ground, ...), matching the isolationSide of the windings on that side. Absent means protective earth or chassis, a reference common to every side.",
+                    "$ref": "./utils.json#/$defs/isolationSide"
+                },
+                "winding": {
+                    "description": "For type tiedToWinding: the name of the winding the core is bonded to, matching coil.functionalDescription[].name. Required when type is tiedToWinding.",
+                    "type": "string"
+                },
+                "terminal": {
+                    "description": "For type tiedToWinding: which end of that winding the core is bonded to. start is the end where the first turn of the winding is wound, end is where the last turn finishes. Required when type is tiedToWinding.",
+                    "title": "windingTerminal",
+                    "type": "string",
+                    "enum": [
+                        "start",
+                        "end"
+                    ]
+                }
+            },
+            "required": [
+                "type"
+            ],
+            "additionalProperties": false,
+            "if": {
+                "properties": {
+                    "type": {
+                        "const": "tiedToWinding"
+                    }
+                },
+                "required": [
+                    "type"
+                ]
+            },
+            "then": {
+                "required": [
+                    "winding",
+                    "terminal"
+                ]
+            }
+        },
+        "shunts": {
+            "description": "Magnetic shunts fitted to the assembled component: pieces of permeable material placed in or beside the winding window to carry leakage flux deliberately, as an integrated leakage transformer needs. They belong to neither the core nor the coil, and are listed here in the order they are assembled.",
+            "type": "array",
+            "items": {
+                "title": "magneticShunt",
+                "description": "One magnetic shunt.",
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "description": "Name given to the shunt, used to refer to it from outputs and geometry.",
+                        "type": "string"
+                    },
+                    "placement": {
+                        "description": "Where the shunt sits: inWindow anywhere inside the winding window, betweenSections in the insulation gap between two sections, onColumn wrapped on or against a column so that it also carries main flux, outsideWindow outside the window against the core.",
+                        "title": "magneticShuntPlacement",
+                        "type": "string",
+                        "enum": [
+                            "inWindow",
+                            "betweenSections",
+                            "onColumn",
+                            "outsideWindow"
+                        ]
+                    },
+                    "coordinates": {
+                        "description": "The coordinates of the centre of the shunt, referred to the centre of the main column.",
+                        "$ref": "./utils.json#/$defs/coordinates"
+                    },
+                    "dimensions": {
+                        "description": "Dimensions of the box enclosing the shunt: width radially, height along the column axis (the sheet thickness of a flat shunt), depth across the window.",
+                        "$ref": "./utils.json#/$defs/dimensions"
+                    },
+                    "gapToColumns": {
+                        "description": "Air gaps left between the shunt and the columns it bridges.",
+                        "title": "magneticShuntGapToColumns",
+                        "type": "object",
+                        "properties": {
+                            "inner": {
+                                "description": "Gap between the shunt and the inner (central) column. Unit: m.",
+                                "type": "number"
+                            },
+                            "outer": {
+                                "description": "Gap between the shunt and the outer (lateral) column. Unit: m.",
+                                "type": "number"
+                            }
+                        },
+                        "additionalProperties": false
+                    },
+                    "segments": {
+                        "description": "Segmentation of the shunt along its length, when it is built from several pieces separated by gaps instead of one continuous piece.",
+                        "type": "array",
+                        "items": {
+                            "title": "magneticShuntSegment",
+                            "description": "One piece of a segmented shunt and the gap that follows it.",
+                            "type": "object",
+                            "properties": {
+                                "length": {
+                                    "description": "Length of the shunt piece. Unit: m.",
+                                    "type": "number"
+                                },
+                                "gap": {
+                                    "description": "Gap between this piece and the next. Unit: m.",
+                                    "type": "number"
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    },
+                    "material": {
+                        "description": "Material of the shunt, either the full core-material record or the name of one. Ferrite-polymer and flexible-ferrite sheets are described as core materials like any other permeable material.",
+                        "oneOf": [
+                            {
+                                "$ref": "./magnetic/core/material.json"
+                            },
+                            {
+                                "description": "Name of the shunt material",
+                                "type": "string"
+                            }
+                        ]
+                    }
+                },
+                "required": [
+                    "placement",
+                    "coordinates",
+                    "dimensions",
+                    "material"
+                ],
+                "additionalProperties": false
+            }
         }
     },
     "required": [],
@@ -72,6 +226,9 @@
                             },
                             {
                                 "$ref": "#/$defs/magneticDatasheetChipBeadElectrical"
+                            },
+                            {
+                                "$ref": "#/$defs/magneticDatasheetCableCoreElectrical"
                             }
                         ]
                     }
@@ -212,6 +369,59 @@
             },
             "required": [
                 "inductance"
+            ],
+            "additionalProperties": false
+        },
+        "magneticDatasheetSaturationCurrent": {
+            "title": "DatasheetSaturationCurrent",
+            "description": "Saturation current stated at a specific inductance-drop criterion — one row of a datasheet's I_sat table. Manufacturer-agnostic: a vendor that quotes I_sat at several |dL/L| criteria (e.g. 10% and 30%) contributes one entry per criterion; a vendor that quotes a single unqualified I_sat uses the scalar saturationCurrentPeak instead.",
+            "type": "object",
+            "properties": {
+                "percentInductanceDrop": {
+                    "description": "Roll-off criterion in percent: the inductance drop |dL/L| from the small-signal value at which this saturation current is specified (e.g. 10, 20, 30).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                },
+                "current": {
+                    "description": "Saturation current in Amperes at the stated inductance-drop criterion.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "temperature": {
+                    "description": "Measurement temperature in degrees Celsius.",
+                    "type": "number"
+                }
+            },
+            "required": [
+                "percentInductanceDrop",
+                "current"
+            ],
+            "additionalProperties": false
+        },
+        "magneticDatasheetRatedCurrent": {
+            "title": "DatasheetRatedCurrent",
+            "description": "Rated current stated at a specific temperature-rise criterion — one row of a datasheet's rated-current table. Manufacturer-agnostic: a vendor that quotes the rating at several self-heating criteria (e.g. Würth IR1 at ΔT=20 K and IR2 at ΔT=40 K) contributes one entry per criterion; a vendor that quotes a single unqualified rating keeps using the plain ratedCurrents array.",
+            "type": "object",
+            "properties": {
+                "current": {
+                    "description": "Rated DC current in Amperes at the stated temperature rise.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "temperatureRise": {
+                    "description": "Self-heating criterion: the temperature rise above ambient, in K, at which this current is rated. Vendors range from 10 K to 40 K for the same '1 A' class of part, so cross-manufacturer comparison is only valid on a common basis.",
+                    "type": "number",
+                    "exclusiveMinimum": 0
+                },
+                "temperature": {
+                    "description": "Ambient reference temperature in degrees Celsius, when the datasheet states it.",
+                    "type": "number"
+                }
+            },
+            "required": [
+                "current",
+                "temperatureRise"
             ],
             "additionalProperties": false
         },
@@ -363,10 +573,24 @@
                         "minimum": 0
                     }
                 },
+                "ratedCurrentPoints": {
+                    "description": "Rated-current table qualified by temperature-rise criterion. Preferred over the bare ratedCurrents array because it carries the ΔT basis, enabling apples-to-apples cross-manufacturer comparison. Omit when the datasheet states only an unqualified rating.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/magneticDatasheetRatedCurrent"
+                    }
+                },
                 "saturationCurrentPeak": {
-                    "description": "Peak saturation current in Amperes (I_sat from datasheet).",
+                    "description": "Peak saturation current in Amperes (I_sat from datasheet). A single unqualified I_sat; when the datasheet states I_sat at explicit inductance-drop criteria, use saturationCurrents instead (or in addition).",
                     "type": "number",
                     "minimum": 0
+                },
+                "saturationCurrents": {
+                    "description": "Saturation-current table: I_sat at one or more inductance-drop criteria (|dL/L| %), when the datasheet specifies them. Preferred over the single saturationCurrentPeak scalar because it carries the roll-off basis, enabling apples-to-apples cross-manufacturer comparison. Omit for a part whose datasheet gives only one unqualified I_sat.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/magneticDatasheetSaturationCurrent"
+                    }
                 },
                 "selfResonantFrequency": {
                     "description": "Self-resonant frequency in Hz.",
@@ -378,6 +602,20 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/$defs/magneticDatasheetImpedancePoint"
+                    }
+                },
+                "resistancePoints": {
+                    "description": "Resistance vs. frequency points, optionally parameterised by DC bias current.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/magneticDatasheetResistancePoint"
+                    }
+                },
+                "reactancePoints": {
+                    "description": "Reactance vs. frequency points, optionally parameterised by DC bias current.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/magneticDatasheetReactancePoint"
                     }
                 },
                 "inductancePoints": {
@@ -435,10 +673,24 @@
                         "minimum": 0
                     }
                 },
+                "ratedCurrentPoints": {
+                    "description": "Rated-current table qualified by temperature-rise criterion. Preferred over the bare ratedCurrents array because it carries the ΔT basis, enabling apples-to-apples cross-manufacturer comparison. Omit when the datasheet states only an unqualified rating.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/magneticDatasheetRatedCurrent"
+                    }
+                },
                 "saturationCurrentPeak": {
-                    "description": "Peak saturation current in Amperes (I_sat from datasheet).",
+                    "description": "Peak saturation current in Amperes (I_sat from datasheet). A single unqualified I_sat; when the datasheet states I_sat at explicit inductance-drop criteria, use saturationCurrents instead (or in addition).",
                     "type": "number",
                     "minimum": 0
+                },
+                "saturationCurrents": {
+                    "description": "Saturation-current table: I_sat at one or more inductance-drop criteria (|dL/L| %), when the datasheet specifies them. Preferred over the single saturationCurrentPeak scalar because it carries the roll-off basis, enabling apples-to-apples cross-manufacturer comparison. Omit for a part whose datasheet gives only one unqualified I_sat.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/magneticDatasheetSaturationCurrent"
+                    }
                 },
                 "selfResonantFrequency": {
                     "description": "Self-resonant frequency in Hz.",
@@ -506,6 +758,13 @@
                         "minimum": 0
                     }
                 },
+                "ratedCurrentPoints": {
+                    "description": "Rated-current table qualified by temperature-rise criterion. Preferred over the bare ratedCurrents array because it carries the ΔT basis, enabling apples-to-apples cross-manufacturer comparison. Omit when the datasheet states only an unqualified rating.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/magneticDatasheetRatedCurrent"
+                    }
+                },
                 "ratedVoltageDC": {
                     "description": "Maximum rated DC voltage between any two terminals in Volts.",
                     "type": "number",
@@ -543,6 +802,18 @@
                     "type": "number",
                     "minimum": 0,
                     "maximum": 1
+                },
+                "saturationCurrentPeak": {
+                    "description": "Peak saturation current in Amperes (I_sat from datasheet), referred to the winding(s) the datasheet states it on (normally the primary). A single unqualified I_sat; when the datasheet states I_sat at explicit inductance-drop criteria, use saturationCurrents instead (or in addition).",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "saturationCurrents": {
+                    "description": "Saturation-current table: I_sat at one or more inductance-drop criteria (|dL/L| %), referred to the winding(s) the datasheet states it on (normally the primary). Preferred over the single saturationCurrentPeak scalar because it carries the roll-off basis.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/magneticDatasheetSaturationCurrent"
+                    }
                 },
                 "selfResonantFrequency": {
                     "description": "Self-resonant frequency in Hz.",
@@ -588,6 +859,18 @@
                         "minimum": 0
                     }
                 },
+                "saturationCurrentPeak": {
+                    "description": "Peak saturation current in Amperes (I_sat from datasheet). For a current-compensated common-mode choke this is the bias (differential/unbalance) current at which the core saturates, as specified by the manufacturer.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "ratedCurrentPoints": {
+                    "description": "Rated-current table qualified by temperature-rise criterion. Preferred over the bare ratedCurrents array because it carries the ΔT basis, enabling apples-to-apples cross-manufacturer comparison. Omit when the datasheet states only an unqualified rating.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/magneticDatasheetRatedCurrent"
+                    }
+                },
                 "ratedVoltageDC": {
                     "description": "Maximum rated DC voltage between any two terminals in Volts.",
                     "type": "number",
@@ -621,6 +904,27 @@
                     "type": "array",
                     "items": {
                         "$ref": "#/$defs/magneticDatasheetImpedancePoint"
+                    }
+                },
+                "differentialModeImpedancePoints": {
+                    "description": "Differential-mode impedance vs. frequency points. The counterpart of impedancePoints for the other mode; leakageInductance is a single scalar and does not describe this curve's shape or where it resonates.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/magneticDatasheetImpedancePoint"
+                    }
+                },
+                "commonModeInsertionLossPoints": {
+                    "description": "Common-mode insertion loss vs. frequency, in dB. The reference impedance the loss was measured in (50 ohm for this class) belongs in commonModeFilter.attenuationTestCondition, not on every point.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "./inputs/topologies/commonModeChoke.json#/$defs/insertionLossAtFrequency"
+                    }
+                },
+                "differentialModeInsertionLossPoints": {
+                    "description": "Differential-mode insertion loss vs. frequency, in dB. Uses the same point type as the common-mode curve: the structure of a (frequency, dB) pair does not change with the mode, and one field name for one physical quantity is worth more than matching each topology's local vocabulary.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "./inputs/topologies/commonModeChoke.json#/$defs/insertionLossAtFrequency"
                     }
                 },
                 "commonModeFilter": {
@@ -668,6 +972,13 @@
                         "minimum": 0
                     }
                 },
+                "ratedCurrentPoints": {
+                    "description": "Rated-current table qualified by temperature-rise criterion (per element for a bead array). Preferred over the bare ratedCurrents array because it carries the ΔT basis, enabling apples-to-apples cross-manufacturer comparison — bead vendors rate '1 A' anywhere from a 10 K to a 40 K rise. Omit when the datasheet states only an unqualified rating.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/magneticDatasheetRatedCurrent"
+                    }
+                },
                 "impedancePoints": {
                     "description": "Impedance vs. frequency points, optionally parameterised by DC bias current.",
                     "type": "array",
@@ -711,6 +1022,82 @@
                 },
                 "selfResonantFrequency": {
                     "description": "Self-resonant frequency in Hz.",
+                    "type": "number",
+                    "minimum": 0
+                }
+            },
+            "required": [
+                "subtype"
+            ],
+            "additionalProperties": false
+        },
+        "magneticDatasheetCableCoreElectrical": {
+            "title": "MagneticDatasheetCableCoreElectrical",
+            "description": "Datasheet electrical characteristics of a clamp-on / cable ferrite core (a 1-port common-mode suppression core the cable is threaded through: clip-on ferrites, cable rings, split/snap-on cores). Electrically a 1-port impedance like a chip bead, but a distinct part class — retrofit/threaded onto a cable rather than reflow-soldered. Per the array-of-configurations idiom, a datasheet that publishes |Z| for several pass counts contributes one entry per pass count, discriminated by numberTurns; the toroid/ring geometry (inner/outer diameter, height) and ferrite material live in the shared core description, not here.",
+            "type": "object",
+            "properties": {
+                "subtype": {
+                    "description": "Discriminator selecting this electrical variant.",
+                    "const": "cableCore"
+                },
+                "name": {
+                    "description": "Label of this connection configuration as given in the datasheet (e.g. '1 turn', '2 turns', 'single pass'). Omit for a part with a single configuration.",
+                    "type": "string"
+                },
+                "numberTurns": {
+                    "description": "Number of cable passes through the core for this configuration's |Z| curve (1 = single pass). Datasheets that tabulate 1/2/3-turn impedance contribute one electrical entry per turn count.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "dcResistance": {
+                    "description": "DC resistance of the threaded conductor in Ohms (usually negligible; present when the datasheet states it). nominal = typical value, maximum = datasheet max.",
+                    "$ref": "./utils.json#/$defs/dimensionWithTolerance"
+                },
+                "ratedCurrents": {
+                    "description": "Rated DC current in Amperes (one entry per conductor; a single-entry array for a single cable). Above this the core's impedance derates through partial saturation.",
+                    "type": "array",
+                    "items": {
+                        "type": "number",
+                        "minimum": 0
+                    }
+                },
+                "ratedCurrentPoints": {
+                    "description": "Rated-current table qualified by temperature-rise criterion. Preferred over the bare ratedCurrents array because it carries the ΔT basis, enabling apples-to-apples cross-manufacturer comparison. Omit when the datasheet states only an unqualified rating.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/magneticDatasheetRatedCurrent"
+                    }
+                },
+                "impedancePoints": {
+                    "description": "Common-mode impedance vs. frequency points for this pass count, optionally parameterised by DC bias current (impedancePoint.current) for the bias-derating curve.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/$defs/magneticDatasheetImpedancePoint"
+                    }
+                },
+                "impedanceTolerance": {
+                    "description": "Tolerance on the impedance values, expressed as a percentage (e.g. 25 means +/-25%).",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
+                },
+                "selfResonantFrequency": {
+                    "description": "Self-resonant frequency in Hz.",
+                    "type": "number",
+                    "minimum": 0
+                },
+                "mountingForm": {
+                    "description": "How the core is fitted to the cable: a closed 'solidRing' the cable is threaded through at build, a hinged 'snapOn' clip that opens for retrofit, a two-piece 'split' core, or a 'screwable' housing. Distinguishes retrofit-installable clamps from build-time rings.",
+                    "type": "string",
+                    "enum": [
+                        "solidRing",
+                        "snapOn",
+                        "split",
+                        "screwable"
+                    ]
+                },
+                "maximumCableOuterDiameter": {
+                    "description": "Largest cable / bundle outer diameter in metres that fits through the core (the inner-diameter fit limit) — a primary selection parameter for a cable core.",
                     "type": "number",
                     "minimum": 0
                 }
