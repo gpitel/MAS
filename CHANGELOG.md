@@ -19,14 +19,31 @@ MAJOR.
 
 ## [Unreleased]
 
-The next release is **2.1.0** (`VERSION`; 2.0.0 was never tagged, and the additive `pcbDesignRules.layerToLayer` below raised it), a MAJOR one relative to 1.0.0: the *Breaking* block below removes the
-top-level `masVersion` and `masConformance` fields and renames/replaces material records
-(`TMFD`, `Metglas`, `Finemet`), so a document that uses any of them becomes invalid or stops
+The next release is **2.2.0** (`VERSION`; 2.0.0 was never tagged, the additive `pcbDesignRules.layerToLayer` below raised it to 2.1.0, and the additive bobbin family `ei` to 2.2.0), a MAJOR one relative to 1.0.0: the *Breaking* block below removes the
+top-level `masVersion` and `masConformance` fields, renames/replaces material records
+(`TMFD`, `Metglas`, `Finemet`) and turns the core coating thickness from a number into a
+`dimensionWithTolerance`, so a document that uses any of them becomes invalid or stops
 resolving. Everything else below is additive (new optional fields and new records), with one
 requirement relaxed.
 
 ### Added
 
+- **Insulation material `PBT GF30 (Nan Ya 1403G6)`** in `data/insulation_materials.ndjson`: a
+  flame-retarded 30 % glass-fibre PBT moulding grade, the plastic of cased (boxed) toroidal cores.
+  Relative permittivity 3.0 and dissipation factor 0.01 at 1 MHz (ASTM D150), dielectric strength
+  20 kV/mm on a 3.2 mm bar (ASTM D149), volume resistivity 1e14 ohm m (ASTM D257), melting point
+  224 C, all at 23 C / 50 % r.h., from Nan Ya's FR-PBT material specification. A core coating names
+  it through `material` (by name) and leaves the optional `type` out: the `coatingType` enum has no
+  value for a moulded case, and none is needed to reference the material. The existing `PBT` record
+  (Pocan B4225) is a GF20 grade with permittivity 3.6 and stays as it is.
+
+- **Bobbin family `ei`.** `bobbin.json` `functionalDescription.family` gains `ei`, the core shape
+  family MAS gives the ET 20 and ET 35 cores (`data/core_shapes.ndjson`). Until now a former for those
+  cores could not state a `functionalDescription`, and so could not state its material, without
+  claiming another family. The core shape family enum has no `et`, so the bobbin enum follows the
+  core's `ei` rather than introducing a name the shapes do not use. Additive: existing documents
+  validate unchanged. Generated C++ (MKF's quicktype command): `BobbinFamily` gains `EI` and its
+  two json conversions; nothing else in `MAS.hpp` changes.
 - **`pcbDesignRules.layerToLayer` and documented defaults for the planar design rules (MAS-RFC 0012 amendment).**
   `layerToLayer` is the dielectric between two adjacent copper layers, used wherever the stack-up does not
   state the insulation layer. `default` keywords: `layerToLayer` 0.1 mm and `trackToTrack` 0.1 mm (IPC-2221B
@@ -309,6 +326,18 @@ requirement relaxed.
 
 ### Breaking
 
+- **Core coating `thickness` is a `dimensionWithTolerance`, no longer a number.**
+  `schemas/magnetic/core/coating.json` `thickness` now `$ref`s the shared PEAS
+  `dimensionWithTolerance` (through the MAS `utils.json` alias), because sources bound a core
+  coating rather than state a nominal (an epoxy "0.6 mm max", a List-of-Parts minimum per ring
+  size): give only the bounds that are known. `thickness` stays required, and a thickness of 0
+  now explicitly means a bare core (a coating object recording that the core was checked and has
+  none). A document with the old scalar form, `"thickness": 0.0006`, no longer validates;
+  migrate it to `{"nominal": 0.0006}`, or to the bound the source actually states
+  (`{"maximum": 0.0006}`). Name-only coatings (`"epoxy"`, `"parylene"`) are unchanged; no MAS
+  data file, sample or example held a coating object, so no data moved. Generated C++ (MKF's
+  quicktype command): `CoreCoating::get_thickness()` returns `DimensionWithTolerance` instead of
+  `double`; nothing else in `MAS.hpp` changes. MKF resolves it with `resolve_dimensional_values`.
 - **Removed `masVersion` and `masConformance` top-level fields.** MAS documents
   are the polymorphic payload of the shared PEAS container, and the PEAS root
   object was closed (`additionalProperties: false`) to reject junk keys. Rather
