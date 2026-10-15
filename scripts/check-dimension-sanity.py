@@ -261,6 +261,10 @@ def check_bobbins(shape_bbox, hard, soft):
         for k, v in dims.items():
             if not math.isfinite(v):
                 hard.append(f"bobbins {name}: dimension {k} is not finite ({v!r})")
+            elif k == "s2" and v == 0:
+                # s2 is the flange thickness; 0 is a flangeless tube (an arbor)
+                # saying so, not a length that lost its unit.
+                continue
             elif not in_range(v, SHAPE_MIN, SHAPE_MAX):
                 hard.append(f"bobbins {name}: dimension {k} = {v:g} m is outside "
                             f"[{SHAPE_MIN:g}, {SHAPE_MAX:g}] m")
