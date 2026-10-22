@@ -19,7 +19,7 @@ MAJOR.
 
 ## [Unreleased]
 
-The next release is **2.2.0** (`VERSION`; 2.0.0 was never tagged, the additive `pcbDesignRules.layerToLayer` below raised it to 2.1.0, and the additive bobbin family `ei` to 2.2.0), a MAJOR one relative to 1.0.0: the *Breaking* block below removes the
+The next release is **2.6.0** (`VERSION`; 2.0.0 was never tagged, the additive `pcbDesignRules.layerToLayer` below raised it to 2.1.0, the additive bobbin family `ei` to 2.2.0, the additive material `density`/`provenance` to 2.3.0, the additive wire-material `specificHeat` to 2.4.0, the relaxed core/winding loss bounds to 2.5.0, and the additive connection `leadConductor`/`exit` to 2.6.0), a MAJOR one relative to 1.0.0: the *Breaking* block below removes the
 top-level `masVersion` and `masConformance` fields, renames/replaces material records
 (`TMFD`, `Metglas`, `Finemet`) and turns the core coating thickness from a number into a
 `dimensionWithTolerance`, so a document that uses any of them becomes invalid or stops
@@ -28,6 +28,31 @@ requirement relaxed.
 
 ### Added
 
+- **Connection `leadConductor` and `exit`.** `coil.json#/$defs/connection` gains an optional
+  `leadConductor` (a `wire.json` record or a catalogue wire name, like a winding's own `wire`: the separate conductor that carries this end to its
+  terminal, such as a round wire soldered to a foil end or a copper strip welded across its
+  width) and an optional `exit` (`radial` | `axial`: whether the lead leaves across the layers
+  wound over this end or along the axis through the end face). A foil or planar sheet is not
+  routed out across the outer windings as its own lead; until now a document could not say
+  what is, so a consumer had to invent a lead size. Absent `leadConductor` means the winding's
+  own conductor is the lead (round, litz, rectangular wire); absent `exit` means radial, the
+  path every existing layout was laid out with. Additive. Generated C++: `Connection` gains
+  `lead_conductor` (the existing `WireDataOrNameUnion`, `std::variant<Wire, std::string>`: the property has the winding wire's own form and title, so the generator reuses that type instead of emitting a duplicate class) and `exit` (`LeadExit`) with their json conversions.
+
+- **Wire material `specificHeat`.** `wire/material.json` gains an optional `specificHeat`
+  (J/(kg K), > 0), the same shape insulation materials have, at the temperature its provenance
+  states. A conductor's thermal capacity (density x specific heat) and a mesh export's thermal
+  material card (Nastran MAT4 CP) need it. Additive. Generated C++: `WireMaterial` gains
+  `specific_heat` with its json conversions.
+- **Material `density` and `provenance`.** `wire/material.json` and `insulation/material.json`
+  gain an optional `density` (kg/m3, > 0), the same shape core materials already have, and all
+  three material records (core, wire, insulation) gain an optional `provenance`, the PEAS trail
+  `utils.json` already aliases. Until now a conductor or insulation material could not state its
+  density, which a mass, a thermal capacity (density x specific heat) or a mesh export's material
+  card needs, and no material could say where any of its values came from. Additive: existing
+  documents validate unchanged. Generated C++ (MKF's quicktype 23.0.170 command): `WireMaterial`
+  and `InsulationMaterial` gain `density`, all three gain `provenance` (the existing `Provenance`
+  type), with their json conversions; nothing else in `MAS.hpp` changes.
 - **Insulation material `PBT GF30 (Nan Ya 1403G6)`** in `data/insulation_materials.ndjson`: a
   flame-retarded 30 % glass-fibre PBT moulding grade, the plastic of cased (boxed) toroidal cores.
   Relative permittivity 3.0 and dissipation factor 0.01 at 1 MHz (ASTM D150), dielectric strength
@@ -185,6 +210,14 @@ requirement relaxed.
   owner-approved change.
 
 ### Changed
+
+- **Core and winding losses may be 0.** `coreLosses`, `volumetricLosses` and `massLosses` in
+  `schemas/outputs/coreLossesOutput.json`, and `windingLosses` in `schemas/outputs.json`, are
+  relaxed from `exclusiveMinimum: 0` to `minimum: 0`, as `eddyCurrentCoreLosses` and
+  `hysteresisCoreLosses` were in 1.0.0. A DC-bias operating point (current, no AC flux) has
+  physically zero core losses, and an unexcited one zero losses of every kind; the old bounds made
+  every simulated document carrying such a point invalid (a user's design with 0 A and DC
+  170-700 A points, ABT #1725). Relaxing: every document valid before stays valid.
 
 - **`resistivity` is no longer required on a core material.** It stays a defined,
   documented property and every existing record keeps it; it is simply no longer
