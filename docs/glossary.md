@@ -72,6 +72,7 @@ names that are not literal property keys are written in plain prose.
 | `effectiveArea` | Equivalent cross-sectional area perpendicular to the flux path per IEC 60205 / IEC 63182. |
 | `effectiveVolume` | Product of effective length and effective area; the magnetised volume. |
 | `minimumArea` | Minimum cross-sectional area along the flux path. |
+| `fillFactor` | Fraction of the gross cross-section that is magnetic material (stacking/lamination factor of a tape-wound or laminated core); already included in `effectiveArea`, `minimumArea` and `effectiveVolume`. |
 
 ## Electrical and Waveform
 
@@ -134,7 +135,7 @@ names that are not literal property keys are written in plain prose.
 
 | Term | Definition |
 |------|------------|
-| `material` | Magnetic material composition family (`ferrite`, `powder`, `nanocrystalline`, `amorphous`, `electricalSteel`). |
+| `material` | Magnetic material composition family (`ferrite`, `powder`, `nanocrystalline`, `amorphous`, `electricalSteel`, `magneticEpoxy`: the cast binder + magnetic-powder shell of a semi-shielded drum). |
 | `materialComposition` | Detailed make-up (`MnZn`, `NiZn`, `FeSiAl`, `FeSi`, `FeNi`, `FeNiMo`, `FeMo`, `carbonylIron`, `iron`). |
 | `resistivity` | Volume resistivity per IEC 60093, in Ω·m. |
 | `density` | Mass per unit volume, in kg/m³. |
